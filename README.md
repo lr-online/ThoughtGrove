@@ -2,11 +2,6 @@
 
 **培育思想的数字园林 | A Digital Garden for Cultivating Ideas**
 
-<div align="center">
-
-![ThoughtGrove Logo](https://via.placeholder.com/150?text=ThoughtGrove)
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.12+](https://img.shields.io/badge/Python-3.12+-green.svg)](https://www.python.org/downloads/)
 
 </div>
@@ -71,78 +66,6 @@ ThoughtGrove 基于以下理念设计：
 - 思维拓展：提出相关问题，促进思考深化
 - 智能标签建议：自动分析内容并推荐相关标签
 
-## 🔧 技术栈
-
-- **后端**：Python, FastAPI
-- **数据库**：MongoDB
-- **AI组件**：OpenAI SDK
-- **前端**：React
-- **身份认证**：JWT
-- **部署**：Docker
-
-## 🚀 安装与使用
-
-### 环境要求
-- Python 3.12+
-- Node.js 16+
-- MongoDB 5.0+
-- Docker
-
-### 安装步骤
-
-```bash
-# 克隆仓库
-git clone https://github.com/yourusername/thought-grove.git
-cd thought-grove
-
-# 后端设置
-cd backend
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
-cp config/.env.example config/.env
-# 编辑 config/.env 文件，填入必要配置
-
-# 前端设置
-cd ../frontend
-npm install
-cp .env.example .env
-# 编辑 .env 文件，填入必要配置
-
-# 启动MongoDB（如果使用Docker）
-cd ../backend
-docker-compose -f docker/docker-compose.yml up -d mongodb
-
-# 启动后端服务
-cd backend
-python -m uvicorn thought_grove.main:app --reload
-
-# 启动前端服务（新终端）
-cd frontend
-npm run dev
-```
-
-## 📂 项目结构
-
-```
-thought-grove/
-├── backend/                    # 后端代码目录
-│   ├── docker/                # Docker 配置文件
-│   ├── config/                # 配置文件
-│   ├── docs/                  # 文档
-│   ├── scripts/               # 工具脚本
-│   ├── tests/                 # 测试文件
-│   ├── thought_grove/         # Python 包
-│   ├── setup.py              # 包配置文件
-│   └── requirements.txt      # 依赖文件
-│
-├── frontend/                  # 前端代码目录
-│   ├── src/                  # 源代码
-│   ├── public/               # 静态文件
-│   └── package.json         # 依赖配置
-│
-└── README.md                 # 项目说明
-```
 
 ## 🤝 贡献指南
 
@@ -154,9 +77,6 @@ thought-grove/
 4. 推送到分支 (`git push origin feature/amazing-idea`)
 5. 开启 Pull Request
 
-## 📜 许可证
-
-本项目采用 MIT 许可证 - 详情见 [LICENSE](LICENSE) 文件
 
 ## 🌟 致谢
 
