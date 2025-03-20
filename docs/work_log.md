@@ -49,6 +49,32 @@
    - 数据库：MongoDB
    - 网络：使用 bridge 网络隔离服务
 
+### 代码规范和优化
+1. 导入路径规范化：
+   - [x] 将所有相对导入路径修改为绝对导入路径
+   - [x] 更新了以下文件的导入语句：
+     - `models/user.py`
+     - `core/security.py`
+     - `crud/user.py`
+     - `db/mongodb.py`
+   - 经验总结：始终使用绝对导入路径，避免使用相对导入，这样可以：
+     - 提高代码可读性和可维护性
+     - 避免深层嵌套导入时的混淆
+     - 防止重构时的路径错误
+     - 使代码结构更清晰
+
+2. Pydantic V2 迁移：
+   - [x] 更新了模型配置，使用 `ConfigDict` 替代类基础配置 
+   - [x] 为 `User` 和 `UserInDB` 模型都应用了 `model_config`
+   - [x] 使用 `field_validator` 替代废弃的 `validator`
+   - [x] 采用 `field_serializer` 替代 `json_encoders`
+   - [x] 所有测试通过，**成功移除所有警告**
+   - Pydantic V2 迁移经验：
+     - 使用 `model_config = ConfigDict(...)` 替代 `class Config`
+     - 使用 `@field_validator` 替代 `@validator`
+     - 使用 `@field_serializer` 实现自定义序列化
+     - 使用 `populate_by_name=True` 替代 `allow_population_by_field_name`
+
 ### 下一步计划
 1. 实现用户认证API：
    - [ ] 用户注册接口
