@@ -16,5 +16,8 @@ class MongoDB:
     @property
     def db(self):
         return self.client[settings.mongodb_db_name]
+        
+    def get_database(self):
+        return self.db
 
 mongodb = MongoDB() 

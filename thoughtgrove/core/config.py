@@ -1,16 +1,17 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from functools import lru_cache
 
 class Settings(BaseSettings):
+    """应用配置"""
     # MongoDB配置
-    mongodb_url: str
-    mongodb_db_name: str
+    mongodb_url: str = "mongodb://localhost:27017"
+    mongodb_db_name: str = "thoughtgrove"
     
     # OpenAI配置
-    openai_api_key: str
+    openai_api_key: str = "your_openai_api_key_here"
     
     # JWT配置
-    jwt_secret_key: str
+    jwt_secret_key: str = "your_jwt_secret_key_here"
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
     
@@ -22,10 +23,14 @@ class Settings(BaseSettings):
     # 日志配置
     log_level: str = "INFO"
     
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=True,
+        extra="ignore",
+        env_prefix=""
+    )
 
 @lru_cache()
 def get_settings() -> Settings:
+    """获取应用配置单例"""
     return Settings() 
