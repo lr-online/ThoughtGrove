@@ -26,6 +26,8 @@ async def create_user(user: UserCreate) -> UserInDB:
     user_dict["hashed_password"] = get_password_hash(user_dict.pop("password"))
     result = await mongodb.db.users.insert_one(user_dict)
     user_dict["id"] = str(result.inserted_id)
+    if "_id" in user_dict:
+        user_dict.pop("_id")
     return UserInDB(**user_dict)
 
 async def update_user(user_id: str, user: UserUpdate) -> Optional[UserInDB]:

@@ -144,3 +144,16 @@
   - 从docker-compose.yml中移除test服务
   - 更新测试指南，简化为使用本地MongoDB服务
   - 使用docker启动独立的MongoDB服务用于测试
+
+## 2024-03-24
+- 代码修复与优化
+  - 修复用户认证相关问题：
+    - 修正create_user函数中MongoDB _id字段处理逻辑，确保正确返回UserInDB对象
+    - 修复测试中的异步客户端使用方式，确保正确使用await关键字
+  - 代码现代化更新：
+    - 将过时的datetime.utcnow()替换为datetime.now(UTC)
+    - 移除自定义event_loop fixture，使用pytest-asyncio提供的默认实现
+  - 整体测试验证：
+    - 所有14个测试用例全部通过
+    - 解决了大部分警告信息
+    - 确认项目基础功能完整可用

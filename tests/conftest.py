@@ -1,22 +1,10 @@
-import asyncio
 import os
 import pytest
 from httpx import AsyncClient
-from dotenv import load_dotenv
 from thoughtgrove.main import app
 from thoughtgrove.db.mongodb import mongodb
 
 # 使用应用默认环境变量配置
-
-@pytest.fixture(scope="session")
-def event_loop():
-    """创建事件循环"""
-    try:
-        loop = asyncio.get_running_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-    yield loop
-    loop.close()
 
 @pytest.fixture
 async def test_client():

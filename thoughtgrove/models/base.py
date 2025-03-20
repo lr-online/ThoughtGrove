@@ -1,11 +1,11 @@
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Optional
 from pydantic import BaseModel, Field, ConfigDict, field_serializer
 
 class BaseDocument(BaseModel):
     id: Optional[str] = Field(None, alias="_id")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     
     model_config = ConfigDict(
         populate_by_name=True,
