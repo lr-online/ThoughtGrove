@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from thoughtgrove.api.auth import router as auth_router
 from thoughtgrove.api.users import router as users_router
+from thoughtgrove.api.notes import router as notes_router
 from thoughtgrove.core.config import get_settings
 from thoughtgrove.db.mongodb import mongodb
 
@@ -34,6 +35,7 @@ app.add_middleware(
 # 注册路由
 app.include_router(auth_router)
 app.include_router(users_router)
+app.include_router(notes_router)
 
 @app.get("/")
 async def root():

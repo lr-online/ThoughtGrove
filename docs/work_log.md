@@ -165,3 +165,32 @@
       - 提供了格式化输出函数，默认转为北京时间
       - 编写完整测试用例验证功能正确性
     - 更新了开发规则文档，添加时区处理指导
+
+## 2024-03-27
+- 随笔记录系统实现
+  - 创建了笔记相关模型：
+    - 实现了NoteBase、NoteCreate、NoteUpdate、Note和NoteInDB模型
+    - 添加了字段验证，确保标题和内容不为空
+  - 实现了笔记CRUD操作：
+    - 创建笔记(create_note)
+    - 获取笔记(get_note)
+    - 更新笔记(update_note)
+    - 删除笔记(delete_note)
+    - 获取用户所有笔记(get_notes_by_user)
+  - 实现了笔记API接口：
+    - POST /api/notes/ - 创建笔记
+    - GET /api/notes/{note_id} - 获取笔记
+    - PUT /api/notes/{note_id} - 更新笔记
+    - DELETE /api/notes/{note_id} - 删除笔记
+    - GET /api/notes/ - 获取用户所有笔记
+  - 编写测试：
+    - 模型测试 - 验证模型字段和验证规则
+    - CRUD测试 - 验证数据库操作
+    - API测试 - 验证API接口功能
+  - 修复认证相关问题：
+    - 统一使用core.deps.py中的get_current_user函数
+    - 修正JWT认证配置
+  - 经验总结：
+    - 使用tree或find命令查看文件结构，可以避免遗漏文件
+    - 模块间依赖应统一管理，避免重复定义
+    - 测试前应清除__pycache__缓存，避免导入冲突

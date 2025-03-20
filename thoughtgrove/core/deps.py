@@ -7,7 +7,8 @@ from thoughtgrove.core.config import get_settings
 from thoughtgrove.crud.user import get_user_by_email
 from thoughtgrove.models.user import User
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+settings = get_settings()
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User:
     """获取当前用户
@@ -21,7 +22,6 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> Use
     )
     
     try:
-        settings = get_settings()
         payload = jwt.decode(
             token,
             settings.jwt_secret_key,

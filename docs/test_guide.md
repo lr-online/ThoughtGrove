@@ -8,7 +8,7 @@ ThoughtGrove项目使用MongoDB作为数据库，并采用pytest进行测试。�
 
 ### 前提条件
 
-1. 确保已安装Python 3.20+和pip
+1. 确保已安装Python 3.12+和pip
 2. 确保MongoDB服务在本地27017端口运行
    ```bash
    # 可以使用Docker启动MongoDB服务
@@ -17,7 +17,7 @@ ThoughtGrove项目使用MongoDB作为数据库，并采用pytest进行测试。�
 
 ### 运行测试
 
-1. 安装项目依赖：`pip install -e ".[test]"`
+1. 进入poetry 环境：`poetry env activate`
 2. 执行测试：`pytest`
 
 ## 测试结构

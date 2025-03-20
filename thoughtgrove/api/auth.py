@@ -8,6 +8,7 @@ from thoughtgrove.crud.user import get_user_by_email, create_user
 from thoughtgrove.models.user import UserCreate, User
 from thoughtgrove.models.token import Token
 
+settings = get_settings()
 router = APIRouter(prefix="/auth", tags=["认证"])
 
 @router.post("/register", response_model=User, status_code=status.HTTP_201_CREATED)
@@ -52,7 +53,6 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         )
     
     # 生成访问令牌
-    settings = get_settings()
     access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
     access_token = create_access_token(
         data={"sub": user.email},
