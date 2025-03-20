@@ -5,7 +5,7 @@ from pydantic import ValidationError
 from thoughtgrove.models.note import Note, NoteCreate, NoteUpdate, NoteInDB
 
 
-class TestNote:
+class TestNoteModel:
     def test_note_create(self):
         """测试创建笔记模型"""
         note_data = {

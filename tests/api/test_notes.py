@@ -22,6 +22,12 @@ class TestNotesAPI:
             json=note_data,
             headers=token_header
         )
+        
+        # 打印详细错误信息便于调试
+        if response.status_code != 201:
+            print(f"Response status code: {response.status_code}")
+            print(f"Response content: {response.text}")
+        
         assert response.status_code == 201
         data = response.json()
         assert data["title"] == note_data["title"]

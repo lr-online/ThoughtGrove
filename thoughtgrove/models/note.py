@@ -27,12 +27,12 @@ class NoteBase(BaseModel):
 
 class NoteCreate(NoteBase):
     """创建笔记模型"""
-    user_id: str
+    user_id: Optional[str] = None
     
     @field_validator("user_id")
     @classmethod
-    def validate_user_id(cls, v: str) -> str:
-        if not v or len(v.strip()) == 0:
+    def validate_user_id(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and len(v.strip()) == 0:
             raise ValueError("用户ID不能为空")
         return v
 
