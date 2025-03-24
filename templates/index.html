@@ -247,12 +247,36 @@
             <p>极简设计理念，让您专注于内容创作而非繁琐的功能学习。无干扰的写作环境，让思维自由流动。</p>
           </div>
           <div class="card">
-            <h3>离线使用</h3>
-            <p>支持离线工作模式，网络不稳定时也能继续记录，待网络恢复后自动同步您的所有更改。</p>
+            <h3>思想种子培育</h3>
+            <p>捕捉灵感火花并系统化培育成熟想法，记录思维发展轨迹，体验思想从萌芽到成熟的全过程。</p>
           </div>
           <div class="card">
-            <h3>跨平台访问</h3>
-            <p>作为渐进式Web应用(PWA)，您可以在任何设备上访问您的笔记，无需安装额外的应用程序。</p>
+            <h3>AI园丁助手</h3>
+            <p>智能助手提供内容分析、思维拓展和创意激发，与您进行有深度的对话，帮助发现新的思考角度。</p>
+          </div>
+          <div class="card">
+            <h3>知识关联网络</h3>
+            <p>自动识别笔记间的关联，构建个人知识图谱，发现思想间隐藏的联系，将零散想法整合为系统性思考。</p>
+          </div>
+          <div class="card">
+            <h3>成长追踪</h3>
+            <p>定期生成思考摘要和成长报告，识别核心主题和认知变化，清晰地看到自己思想和知识体系的演变。</p>
+          </div>
+          <div class="card">
+            <h3>思想时间胶囊</h3>
+            <p>将思考封存在特定的时间胶囊中，设置未来开启的时机，与未来的自己对话，见证思想和观念的演变。</p>
+          </div>
+          <div class="card">
+            <h3>认知偏见提醒</h3>
+            <p>系统智能识别思考中可能存在的认知偏见，提供多角度思考建议，帮助您建立更全面客观的思维方式。</p>
+          </div>
+          <div class="card">
+            <h3>创意激发工具</h3>
+            <p>基于您的历史内容和兴趣，提供个性化的思考提示和灵感激发，帮助突破思维局限，产生创新性想法。</p>
+          </div>
+          <div class="card">
+            <h3>跨媒介知识整合</h3>
+            <p>支持文字、图片、语音、手绘等多种记录方式，将不同形式的思想碎片整合为完整的知识体系。</p>
           </div>
         </div>
       </div>
@@ -404,9 +428,6 @@
               const noteElement = createNoteElement(note);
               notesContainer.appendChild(noteElement);
             });
-            
-            // 尝试加载离线笔记
-            loadOfflineNotes();
           }
         } catch (error) {
           console.error('加载笔记失败:', error);
@@ -418,9 +439,6 @@
           `;
           
           document.getElementById('retry-load')?.addEventListener('click', loadNotes);
-          
-          // 尝试加载离线笔记
-          loadOfflineNotes();
         }
       }
       
@@ -441,45 +459,7 @@
         noteElement.querySelector('.edit-note-btn').href = `/notes/${note.id}`;
         noteElement.querySelector('.delete-note-btn').dataset.noteId = note.id;
         
-        // 标记离线笔记
-        if (note.id.toString().startsWith('offline-')) {
-          noteElement.classList.add('offline-note');
-          const offlineBadge = document.createElement('span');
-          offlineBadge.className = 'offline-badge';
-          offlineBadge.textContent = '离线';
-          offlineBadge.style.fontSize = '0.75rem';
-          offlineBadge.style.padding = '0.125rem 0.375rem';
-          offlineBadge.style.backgroundColor = 'var(--color-bg-tertiary)';
-          offlineBadge.style.borderRadius = '0.25rem';
-          offlineBadge.style.marginLeft = '0.5rem';
-          noteElement.querySelector('.note-meta').appendChild(offlineBadge);
-        }
-        
         return noteElement;
-      }
-      
-      // 加载离线笔记
-      function loadOfflineNotes() {
-        const offlineNotes = JSON.parse(localStorage.getItem('offline-notes') || '[]');
-        
-        if (offlineNotes.length > 0) {
-          const notesContainer = document.getElementById('notes-container');
-          const emptyNotes = document.getElementById('empty-notes');
-          
-          // 隐藏无笔记提示
-          emptyNotes.style.display = 'none';
-          
-          // 添加离线笔记
-          offlineNotes.forEach(note => {
-            // 检查是否已经显示了该笔记
-            const existingNote = document.querySelector(`.note-item [data-note-id="${note.id}"]`);
-            
-            if (!existingNote) {
-              const noteElement = createNoteElement(note);
-              notesContainer.appendChild(noteElement);
-            }
-          });
-        }
       }
     });
   </script>
