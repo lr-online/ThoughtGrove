@@ -4,8 +4,8 @@
   "description": "一个简洁优雅的个人笔记和思考整理工具",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#007bff",
+  "background_color": "#f2efe6",
+  "theme_color": "#a2432e",
   "icons": [
     {
       "src": "/static/images/icon-192.png",

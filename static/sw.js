@@ -9,10 +9,10 @@ const CACHE_NAME = 'thoughtgrove-v1';
 const RESOURCES_TO_CACHE = [
   '/static/css/styles.css',
   '/static/js/main.js',
-  '/static/icons/favicon.ico',
-  '/static/icons/icon-192x192.png',
-  '/static/icons/icon-512x512.png',
-  '/manifest.json'
+  '/static/images/favicon.ico',
+  '/static/images/icon-192.png',
+  '/static/images/icon-512.png',
+  '/static/manifest.json'
 ];
 
 // 安装事件 - 预缓存资源

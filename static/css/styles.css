@@ -2,41 +2,45 @@
 
 /* 变量与主题 */
 :root {
-  /* 亮色主题变量 */
-  --color-bg-primary: #ffffff;
-  --color-bg-secondary: #f8f9fa;
-  --color-bg-tertiary: #e9ecef;
-  --color-text-primary: #212529;
-  --color-text-secondary: #495057;
-  --color-text-tertiary: #6c757d;
-  --color-accent: #007bff;
-  --color-accent-hover: #0056b3;
-  --color-border: #dee2e6;
-  --color-error: #dc3545;
-  --color-success: #28a745;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  /* 亮色主题变量 - 中国传统山水画配色 */
+  --color-bg-primary: #f2efe6;      /* 宣纸白 - 背景 */
+  --color-bg-secondary: #f8f7f2;    /* 浅宣纸色 - 次级背景 */
+  --color-bg-tertiary: #e9e6dc;     /* 淡米色 - 第三级背景 */
+  --color-text-primary: #2c3639;    /* 墨黑 - 主要文本 */
+  --color-text-secondary: #536b57;  /* 松柏绿 - 次要文本 */
+  --color-text-tertiary: #8c7d64;   /* 古朴棕 - 第三级文本 */
+  --color-accent: #a2432e;          /* 朱砂红 - 强调色 */
+  --color-accent-hover: #c25841;    /* 亮朱砂红 - 强调色悬停 */
+  --color-border: #d5d0c0;          /* 淡米色 - 边框 */
+  --color-error: #9e4b37;           /* 胭脂红 - 错误 */
+  --color-success: #6b8e5e;         /* 苔绿 - 成功 */
+  --color-warning: #cda75c;         /* 赭石黄 - 警告 */
+  --shadow-sm: 0 1px 3px rgba(44, 54, 57, 0.12);
+  --shadow-md: 0 4px 6px rgba(44, 54, 57, 0.1);
+  --shadow-lg: 0 10px 15px rgba(44, 54, 57, 0.1);
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-serif: 'Noto Serif', 'Times New Roman', serif;
   --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
   --transition-speed: 0.2s;
 }
 
-/* 深色主题变量 */
+/* 深色主题变量 - 中国传统夜色配色 */
 .dark-theme {
-  --color-bg-primary: #212529;
-  --color-bg-secondary: #343a40;
-  --color-bg-tertiary: #495057;
-  --color-text-primary: #f8f9fa;
-  --color-text-secondary: #e9ecef;
-  --color-text-tertiary: #dee2e6;
-  --color-accent: #4dabf7;
-  --color-accent-hover: #74c0fc;
-  --color-border: #495057;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4);
+  --color-bg-primary: #2c2c2c;       /* 墨夜 - 背景 */
+  --color-bg-secondary: #353535;     /* 深墨 - 次级背景 */
+  --color-bg-tertiary: #404040;      /* 烟墨 - 第三级背景 */
+  --color-text-primary: #e8e1d5;     /* 素笺 - 主要文本 */
+  --color-text-secondary: #a8c1ad;   /* 淡松绿 - 次要文本 */
+  --color-text-tertiary: #b09c7c;    /* 淡古铜 - 第三级文本 */
+  --color-accent: #d17666;           /* 暗朱砂 - 强调色 */
+  --color-accent-hover: #e88d7c;     /* 亮暗朱砂 - 强调色悬停 */
+  --color-border: #474747;           /* 深灰 - 边框 */
+  --color-error: #d17666;            /* 暗朱砂 - 错误 */
+  --color-success: #7a9b69;          /* 暗苔绿 - 成功 */
+  --color-warning: #d5b472;          /* 暗赭石 - 警告 */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.6);
 }
 
 /* 基础样式重置 */
