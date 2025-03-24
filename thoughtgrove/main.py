@@ -1,10 +1,13 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 
 from thoughtgrove.api.auth import router as auth_router
 from thoughtgrove.api.users import router as users_router
 from thoughtgrove.api.notes import router as notes_router
+from thoughtgrove.pages import router as pages_router
 from thoughtgrove.core.config import get_settings
 from thoughtgrove.db.mongodb import mongodb
 
@@ -32,10 +35,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 注册路由
+# 挂载静态文件目录
+static_dir = Path(__file__).parent.parent / "static"
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
+# 注册API路由
 app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(notes_router)
+
+# 注册页面路由（优先级低于API路由）
+app.include_router(pages_router)
 
 @app.get("/")
 async def root():

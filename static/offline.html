@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>离线模式 - 拙园</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <style>
+    .offline-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 80vh;
+      text-align: center;
+      padding: 0 1rem;
+    }
+    
+    .offline-icon {
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+      color: var(--color-text-secondary);
+    }
+    
+    .offline-title {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+    
+    .offline-message {
+      max-width: 600px;
+      margin-bottom: 2rem;
+      color: var(--color-text-secondary);
+    }
+    
+    .offline-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    @media (min-width: 640px) {
+      .offline-actions {
+        flex-direction: row;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-container">
+    <div class="offline-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="1" y1="1" x2="23" y2="23"></line>
+        <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"></path>
+        <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"></path>
+        <path d="M10.71 5.05A16 16 0 0 1 22.58 9"></path>
+        <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"></path>
+        <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+        <line x1="12" y1="20" x2="12.01" y2="20"></line>
+      </svg>
+    </div>
+    <h1 class="offline-title">您处于离线状态</h1>
+    <p class="offline-message">无法连接到网络。拙园已缓存部分内容，您可以在离线状态下访问已浏览过的页面。</p>
+    
+    <div class="offline-actions">
+      <button id="reload-btn" class="btn">重新加载页面</button>
+      <a href="/" class="btn btn-outline">返回主页</a>
+    </div>
+    
+    <div id="offline-notes" class="offline-notes" style="margin-top: 3rem; width: 100%; max-width: 600px;"></div>
+  </div>
+
+  <script>
+    // 重新加载按钮
+    document.getElementById('reload-btn').addEventListener('click', function() {
+      window.location.reload();
+    });
+    
+    // 检查并显示离线笔记
+    const offlineNotesEl = document.getElementById('offline-notes');
+    const offlineNotes = JSON.parse(localStorage.getItem('offline-notes') || '[]');
+    
+    if (offlineNotes.length > 0) {
+      let notesHtml = '<h2 style="margin-bottom: 1rem;">您的离线笔记</h2>';
+      
+      offlineNotes.forEach(note => {
+        const date = new Date(note.updated_at).toLocaleDateString('zh-CN');
+        
+        notesHtml += `
+          <div class="card" style="text-align: left;">
+            <div class="card-header">
+              <h3 class="card-title">${note.title}</h3>
+              <div style="font-size: 0.875rem; color: var(--color-text-tertiary);">
+                最后编辑: ${date}
+              </div>
+            </div>
+            <div class="card-body">
+              <p>${note.content.substring(0, 100)}${note.content.length > 100 ? '...' : ''}</p>
+            </div>
+            <div class="card-footer">
+              <small>离线保存</small>
+            </div>
+          </div>
+        `;
+      });
+      
+      offlineNotesEl.innerHTML = notesHtml;
+    }
+    
+    // 监听网络状态变化
+    window.addEventListener('online', function() {
+      document.querySelector('.offline-title').textContent = '网络已恢复';
+      document.querySelector('.offline-message').textContent = '您的网络连接已恢复，点击下方按钮继续使用拙园。';
+      document.getElementById('reload-btn').textContent = '刷新页面';
+    });
+  </script>
+</body>
+</html> 

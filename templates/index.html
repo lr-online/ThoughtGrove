@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>拙园 - 个人笔记与思考整理</title>
+  <meta name="description" content="拙园是一个简洁优雅的个人笔记和思考整理工具">
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <link rel="manifest" href="/static/manifest.json">
+  <link rel="icon" href="/static/images/favicon.ico">
+  <meta name="theme-color" content="#007bff">
+  <!-- 添加PWA相关标签 -->
+  <link rel="apple-touch-icon" href="/static/images/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <style>
+    .page-container {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    
+    .main-content {
+      flex: 1;
+      padding: var(--spacing-lg) 0;
+    }
+    
+    .notes-header {
+      margin-bottom: var(--spacing-xl);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .notes-title {
+      font-family: var(--font-serif);
+      color: var(--color-primary);
+      font-size: 1.8rem;
+    }
+    
+    .notes-actions {
+      display: flex;
+      gap: var(--spacing-md);
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: var(--spacing-xxl) 0;
+    }
+    
+    .empty-state-icon {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto var(--spacing-lg);
+      opacity: 0.4;
+    }
+    
+    .empty-state-title {
+      font-family: var(--font-serif);
+      color: var(--color-primary);
+      font-size: 1.5rem;
+      margin-bottom: var(--spacing-md);
+    }
+    
+    .empty-state-text {
+      color: var(--color-secondary);
+      margin-bottom: var(--spacing-lg);
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .note-item {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      border-left: 4px solid var(--color-primary);
+    }
+    
+    .note-item:hover {
+      transform: translateX(5px);
+    }
+    
+    .note-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--color-dark);
+      margin-bottom: var(--spacing-xs);
+    }
+    
+    .note-content {
+      color: var(--color-secondary);
+      margin-bottom: var(--spacing-md);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    
+    .note-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: var(--color-secondary);
+    }
+    
+    .loading-notes {
+      text-align: center;
+      padding: var(--spacing-xxl) 0;
+      color: var(--color-secondary);
+    }
+    
+    .loading-spinner {
+      border: 3px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top: 3px solid var(--color-primary);
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto var(--spacing-md);
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .site-footer {
+      background-color: var(--color-dark);
+      color: white;
+      padding: var(--spacing-lg) 0;
+    }
+    
+    .footer-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .footer-brand {
+      font-family: var(--font-serif);
+      font-size: 1.2rem;
+    }
+    
+    .footer-nav {
+      display: flex;
+      gap: var(--spacing-lg);
+    }
+    
+    .footer-link {
+      color: rgba(255, 255, 255, 0.7);
+      transition: color 0.3s ease;
+    }
+    
+    .footer-link:hover {
+      color: white;
+    }
+    
+    @media (max-width: 768px) {
+      .footer-content {
+        flex-direction: column;
+        text-align: center;
+        gap: var(--spacing-md);
+      }
+      
+      .notes-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-md);
+      }
+      
+      .notes-actions {
+        width: 100%;
+      }
+      
+      .notes-actions .btn {
+        flex: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 头部导航 -->
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <a href="/">拙园</a>
+        </div>
+        <nav class="nav">
+          <a href="/" class="active">首页</a>
+          <a href="/notes/new">新建笔记</a>
+          <a href="/about">关于</a>
+          <a href="/profile" id="profile-link">个人中心</a>
+          <a href="/login" id="login-link">登录</a>
+          <a href="/register" id="register-link">注册</a>
+          <a href="#" id="logout-link" style="display: none;">退出</a>
+        </nav>
+        <div class="theme-toggle-wrapper">
+          <span>🌙</span>
+          <label class="theme-toggle">
+            <input type="checkbox" id="theme-toggle">
+            <span class="slider"></span>
+          </label>
+          <span>☀️</span>
+        </div>
+        <button class="mobile-menu-toggle" id="menu-toggle">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+  
+  <!-- 移动端导航菜单 -->
+  <div id="mobile-menu" class="hidden">
+    <a href="/" class="active">首页</a>
+    <a href="/notes/new">新建笔记</a>
+    <a href="/about">关于</a>
+    <a href="/profile" id="mobile-profile-link">个人中心</a>
+    <a href="/login" id="mobile-login-link">登录</a>
+    <a href="/register" id="mobile-register-link">注册</a>
+    <a href="#" id="mobile-logout-link" style="display: none;">退出</a>
+  </div>
+  
+  <!-- 主要内容 -->
+  <main class="content">
+    <div class="container">
+      <!-- 未登录状态展示 -->
+      <div id="guest-view">
+        <div class="hero" style="text-align: center; padding: 3rem 1rem;">
+          <h1>拙园 ThoughtGrove</h1>
+          <p style="font-size: 1.25rem; max-width: 600px; margin: 1rem auto;">
+            一个简洁优雅的个人笔记和思考整理工具，让您随时随地记录灵感，整理思绪。
+          </p>
+          <div style="margin-top: 2rem;">
+            <a href="/register" class="btn btn-lg">立即开始</a>
+            <a href="/about" class="btn btn-outline btn-lg" style="margin-left: 1rem;">了解更多</a>
+          </div>
+        </div>
+        
+        <div class="features" style="margin: 3rem 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+          <div class="card">
+            <h3>简洁直观</h3>
+            <p>极简设计理念，让您专注于内容创作而非繁琐的功能学习。无干扰的写作环境，让思维自由流动。</p>
+          </div>
+          <div class="card">
+            <h3>离线使用</h3>
+            <p>支持离线工作模式，网络不稳定时也能继续记录，待网络恢复后自动同步您的所有更改。</p>
+          </div>
+          <div class="card">
+            <h3>跨平台访问</h3>
+            <p>作为渐进式Web应用(PWA)，您可以在任何设备上访问您的笔记，无需安装额外的应用程序。</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 登录状态展示 -->
+      <div id="user-view" style="display: none;">
+        <div class="flex justify-between items-center" style="margin-bottom: 1.5rem;">
+          <h1>我的笔记</h1>
+          <a href="/notes/new" class="btn">新建笔记</a>
+        </div>
+        
+        <div class="search-container" style="margin-bottom: 2rem;">
+          <input type="text" id="note-search" class="form-control" placeholder="搜索笔记..." style="max-width: 100%;">
+        </div>
+        
+        <div id="notes-container">
+          <!-- 笔记列表将通过JavaScript动态加载 -->
+          <div class="notes-loading" style="text-align: center; padding: 3rem 0;">
+            <p>加载中...</p>
+          </div>
+        </div>
+        
+        <!-- 无笔记时显示 -->
+        <div id="empty-notes" style="text-align: center; padding: 3rem 0; display: none;">
+          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1rem;">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          <h2>您还没有创建任何笔记</h2>
+          <p style="margin-bottom: 1.5rem;">点击"新建笔记"按钮开始记录您的思考</p>
+          <a href="/notes/new" class="btn">创建第一篇笔记</a>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <!-- 底部 -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div>&copy; 2024 拙园 ThoughtGrove</div>
+        <div class="footer-links">
+          <a href="/terms">使用条款</a>
+          <a href="/privacy">隐私政策</a>
+          <a href="/contact">联系我们</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- 笔记项模板 -->
+  <template id="note-template">
+    <div class="card note-item">
+      <div class="card-header">
+        <h3 class="card-title note-title"></h3>
+        <div class="note-meta">
+          <span class="note-date"></span>
+          <span class="note-tags"></span>
+        </div>
+      </div>
+      <div class="card-body">
+        <p class="note-preview"></p>
+      </div>
+      <div class="card-footer">
+        <div class="note-actions">
+          <a href="#" class="btn btn-sm btn-outline edit-note-btn">编辑</a>
+          <button class="btn btn-sm delete-note-btn" data-note-id="">删除</button>
+        </div>
+      </div>
+    </div>
+  </template>
+  
+  <!-- JavaScript -->
+  <script src="/static/js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const token = localStorage.getItem('access_token');
+      const guestView = document.getElementById('guest-view');
+      const userView = document.getElementById('user-view');
+      const loginLink = document.getElementById('login-link');
+      const registerLink = document.getElementById('register-link');
+      const profileLink = document.getElementById('profile-link');
+      const logoutLink = document.getElementById('logout-link');
+      const mobileLoginLink = document.getElementById('mobile-login-link');
+      const mobileRegisterLink = document.getElementById('mobile-register-link');
+      const mobileProfileLink = document.getElementById('mobile-profile-link');
+      const mobileLogoutLink = document.getElementById('mobile-logout-link');
+      
+      // 根据登录状态显示不同的导航项和视图
+      if (token) {
+        // 用户已登录
+        guestView.style.display = 'none';
+        userView.style.display = 'block';
+        
+        loginLink.style.display = 'none';
+        registerLink.style.display = 'none';
+        profileLink.style.display = 'inline-block';
+        logoutLink.style.display = 'inline-block';
+        
+        mobileLoginLink.style.display = 'none';
+        mobileRegisterLink.style.display = 'none';
+        mobileProfileLink.style.display = 'block';
+        mobileLogoutLink.style.display = 'block';
+        
+        // 加载用户笔记
+        loadNotes();
+      }
+      
+      // 退出登录
+      logoutLink.addEventListener('click', handleLogout);
+      mobileLogoutLink.addEventListener('click', handleLogout);
+      
+      function handleLogout(e) {
+        e.preventDefault();
+        localStorage.removeItem('access_token');
+        window.location.href = '/login';
+      }
+      
+      // 加载笔记列表
+      async function loadNotes() {
+        const notesContainer = document.getElementById('notes-container');
+        const emptyNotes = document.getElementById('empty-notes');
+        
+        try {
+          const response = await fetch('/api/notes/', {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+          
+          if (!response.ok) {
+            throw new Error('获取笔记失败');
+          }
+          
+          const notes = await response.json();
+          
+          // 移除加载中提示
+          notesContainer.innerHTML = '';
+          
+          if (notes.length === 0) {
+            // 显示无笔记提示
+            emptyNotes.style.display = 'block';
+          } else {
+            // 渲染笔记列表
+            notes.forEach(note => {
+              const noteElement = createNoteElement(note);
+              notesContainer.appendChild(noteElement);
+            });
+            
+            // 尝试加载离线笔记
+            loadOfflineNotes();
+          }
+        } catch (error) {
+          console.error('加载笔记失败:', error);
+          notesContainer.innerHTML = `
+            <div style="text-align: center; padding: 2rem 0;">
+              <p>加载笔记失败，请稍后再试</p>
+              <button id="retry-load" class="btn btn-sm" style="margin-top: 1rem;">重试</button>
+            </div>
+          `;
+          
+          document.getElementById('retry-load')?.addEventListener('click', loadNotes);
+          
+          // 尝试加载离线笔记
+          loadOfflineNotes();
+        }
+      }
+      
+      // 创建笔记元素
+      function createNoteElement(note) {
+        const template = document.getElementById('note-template');
+        const noteElement = document.importNode(template.content, true).firstElementChild;
+        
+        // 设置笔记内容
+        noteElement.querySelector('.note-title').textContent = note.title;
+        noteElement.querySelector('.note-preview').textContent = note.content.substring(0, 200) + (note.content.length > 200 ? '...' : '');
+        
+        // 格式化日期
+        const date = new Date(note.updated_at || note.created_at);
+        noteElement.querySelector('.note-date').textContent = `更新于 ${date.toLocaleDateString('zh-CN')}`;
+        
+        // 设置链接和ID
+        noteElement.querySelector('.edit-note-btn').href = `/notes/${note.id}`;
+        noteElement.querySelector('.delete-note-btn').dataset.noteId = note.id;
+        
+        // 标记离线笔记
+        if (note.id.toString().startsWith('offline-')) {
+          noteElement.classList.add('offline-note');
+          const offlineBadge = document.createElement('span');
+          offlineBadge.className = 'offline-badge';
+          offlineBadge.textContent = '离线';
+          offlineBadge.style.fontSize = '0.75rem';
+          offlineBadge.style.padding = '0.125rem 0.375rem';
+          offlineBadge.style.backgroundColor = 'var(--color-bg-tertiary)';
+          offlineBadge.style.borderRadius = '0.25rem';
+          offlineBadge.style.marginLeft = '0.5rem';
+          noteElement.querySelector('.note-meta').appendChild(offlineBadge);
+        }
+        
+        return noteElement;
+      }
+      
+      // 加载离线笔记
+      function loadOfflineNotes() {
+        const offlineNotes = JSON.parse(localStorage.getItem('offline-notes') || '[]');
+        
+        if (offlineNotes.length > 0) {
+          const notesContainer = document.getElementById('notes-container');
+          const emptyNotes = document.getElementById('empty-notes');
+          
+          // 隐藏无笔记提示
+          emptyNotes.style.display = 'none';
+          
+          // 添加离线笔记
+          offlineNotes.forEach(note => {
+            // 检查是否已经显示了该笔记
+            const existingNote = document.querySelector(`.note-item [data-note-id="${note.id}"]`);
+            
+            if (!existingNote) {
+              const noteElement = createNoteElement(note);
+              notesContainer.appendChild(noteElement);
+            }
+          });
+        }
+      }
+    });
+  </script>
+</body>
+</html> 

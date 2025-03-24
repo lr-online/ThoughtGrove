@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>编辑笔记 - 拙园</title>
+  <link rel="stylesheet" href="/static/css/main.css">
+  <link rel="manifest" href="/static/manifest.json">
+  <meta name="theme-color" content="#536b57">
+  <style>
+    .page-container {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    
+    .editor-container {
+      flex: 1;
+      padding: var(--spacing-lg) 0;
+    }
+    
+    .editor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--spacing-lg);
+    }
+    
+    .editor-title {
+      font-family: var(--font-serif);
+      color: var(--color-primary);
+      font-size: 1.8rem;
+    }
+    
+    .editor-actions {
+      display: flex;
+      gap: var(--spacing-md);
+    }
+    
+    .title-input {
+      font-size: 1.5rem;
+      padding: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+      border: 1px solid #ddd;
+      border-radius: var(--radius-md);
+      width: 100%;
+      font-family: var(--font-sans);
+    }
+    
+    .content-editor {
+      width: 100%;
+      min-height: 400px;
+      padding: var(--spacing-md);
+      border: 1px solid #ddd;
+      border-radius: var(--radius-md);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      resize: vertical;
+    }
+    
+    .title-input:focus,
+    .content-editor:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+    
+    .error-message {
+      color: var(--color-error);
+      margin-top: var(--spacing-md);
+      padding: var(--spacing-md);
+      background-color: rgba(158, 75, 55, 0.1);
+      border-radius: var(--radius-sm);
+      display: none;
+    }
+    
+    .saving-indicator {
+      display: flex;
+      align-items: center;
+      margin-left: var(--spacing-md);
+      color: var(--color-secondary);
+      font-size: 0.9rem;
+    }
+    
+    .saving-spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top: 2px solid var(--color-primary);
+      animation: spin 1s linear infinite;
+      margin-right: var(--spacing-xs);
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* 响应式调整 */
+    @media (max-width: 768px) {
+      .editor-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-md);
+      }
+      
+      .editor-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <nav class="navbar">
+      <div class="container navbar-container">
+        <a href="/" class="navbar-brand">拙园</a>
+        
+        <div class="mobile-menu-toggle">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </div>
+        
+        <ul class="navbar-menu">
+          <li class="navbar-item"><a href="/">笔记</a></li>
+          <li class="navbar-item"><a href="#" id="logoutButton">退出</a></li>
+        </ul>
+      </div>
+    </nav>
+    
+    <main class="editor-container">
+      <div class="container">
+        <div class="editor-header">
+          <h1 class="editor-title" id="pageTitle">创建新笔记</h1>
+          
+          <div class="editor-actions">
+            <button id="cancelButton" class="btn btn-secondary">取消</button>
+            <button id="saveButton" class="btn btn-primary">保存笔记</button>
+            <div id="savingIndicator" class="saving-indicator" style="display: none;">
+              <div class="saving-spinner"></div>
+              <span>正在保存...</span>
+            </div>
+          </div>
+        </div>
+        
+        <form id="noteForm">
+          <input type="text" id="titleInput" class="title-input" placeholder="请输入标题..." required>
+          <textarea id="contentEditor" class="content-editor" placeholder="开始记录您的思想..." required></textarea>
+          <div id="errorMessage" class="error-message"></div>
+        </form>
+      </div>
+    </main>
+    
+    <footer class="site-footer">
+      <div class="container footer-content">
+        <div class="footer-brand">拙园</div>
+        
+        <div class="footer-nav">
+          <a href="#" class="footer-link">关于</a>
+          <a href="#" class="footer-link">隐私政策</a>
+          <a href="#" class="footer-link">帮助</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+  
+  <script src="/static/js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // 检查用户是否已登录
+      if (!auth.isAuthenticated()) {
+        window.location.href = '/login';
+        return;
+      }
+      
+      // 获取DOM元素
+      const noteForm = document.getElementById('noteForm');
+      const titleInput = document.getElementById('titleInput');
+      const contentEditor = document.getElementById('contentEditor');
+      const saveButton = document.getElementById('saveButton');
+      const cancelButton = document.getElementById('cancelButton');
+      const errorMessage = document.getElementById('errorMessage');
+      const savingIndicator = document.getElementById('savingIndicator');
+      const pageTitle = document.getElementById('pageTitle');
+      
+      // 获取URL参数
+      const urlParams = new URLSearchParams(window.location.search);
+      const noteId = urlParams.get('id');
+      
+      // 是否为编辑模式
+      const isEditMode = !!noteId;
+      
+      // 如果是编辑模式，加载现有笔记
+      if (isEditMode) {
+        pageTitle.textContent = '编辑笔记';
+        loadExistingNote(noteId);
+      }
+      
+      // 取消按钮事件
+      cancelButton.addEventListener('click', function() {
+        window.location.href = '/';
+      });
+      
+      // 保存按钮事件
+      saveButton.addEventListener('click', async function() {
+        if (!validateForm()) {
+          return;
+        }
+        
+        // 显示保存指示器
+        savingIndicator.style.display = 'flex';
+        saveButton.disabled = true;
+        
+        const noteData = {
+          title: titleInput.value,
+          content: contentEditor.value
+        };
+        
+        try {
+          let result;
+          
+          if (isEditMode) {
+            // 更新现有笔记
+            result = await notes.updateNote(noteId, noteData);
+          } else {
+            // 创建新笔记
+            result = await notes.createNote(noteData);
+          }
+          
+          if (result) {
+            // 保存成功，返回笔记列表
+            window.location.href = '/';
+          } else {
+            throw new Error('操作失败');
+          }
+        } catch (error) {
+          console.error('保存笔记失败:', error);
+          showError('保存笔记失败，请重试');
+          
+          // 隐藏保存指示器
+          savingIndicator.style.display = 'none';
+          saveButton.disabled = false;
+        }
+      });
+      
+      // 加载现有笔记
+      async function loadExistingNote(id) {
+        try {
+          const note = await notes.getNote(id);
+          
+          if (note) {
+            titleInput.value = note.title;
+            contentEditor.value = note.content;
+          } else {
+            showError('找不到指定的笔记');
+          }
+        } catch (error) {
+          console.error('加载笔记失败:', error);
+          showError('加载笔记失败，请重试');
+        }
+      }
+      
+      // 验证表单
+      function validateForm() {
+        let isValid = true;
+        
+        if (!titleInput.value.trim()) {
+          showError('请输入笔记标题');
+          isValid = false;
+        } else if (!contentEditor.value.trim()) {
+          showError('请输入笔记内容');
+          isValid = false;
+        }
+        
+        return isValid;
+      }
+      
+      // 显示错误消息
+      function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.style.display = 'block';
+        
+        // 5秒后自动隐藏
+        setTimeout(() => {
+          errorMessage.style.display = 'none';
+        }, 5000);
+      }
+      
+      // 注销按钮事件
+      document.getElementById('logoutButton').addEventListener('click', function(e) {
+        e.preventDefault();
+        auth.logout();
+      });
+    });
+  </script>
+</body>
+</html> 
