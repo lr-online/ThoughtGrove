@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // 注册Service Worker
 function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/static/js/service-worker.js')
+    navigator.serviceWorker.register('/static/sw.js')
       .then(registration => {
         console.log('Service Worker 注册成功，作用域：', registration.scope);
       })
@@ -284,19 +284,6 @@ async function handleNoteSubmit(event) {
     console.error('保存笔记请求失败:', error);
     errorDisplay.textContent = '保存请求失败，请稍后再试';
     errorDisplay.classList.remove('hidden');
-    
-    // 离线模式：保存到IndexedDB
-    if (!navigator.onLine) {
-      saveNoteOffline({
-        id: noteId || 'offline-' + Date.now(),
-        title,
-        content,
-        updated_at: new Date().toISOString()
-      });
-      
-      alert('您当前处于离线状态，笔记已保存到本地，将在网络恢复后同步');
-      window.location.href = '/';
-    }
   }
 }
 
@@ -344,47 +331,21 @@ async function handleNoteDelete(event) {
 // 处理笔记搜索
 function handleNoteSearch(event) {
   const searchTerm = event.target.value.toLowerCase();
-  const noteItems = document.querySelectorAll('.note-item');
+  const noteCards = document.querySelectorAll('.note-card');
   
-  noteItems.forEach(item => {
-    const title = item.querySelector('.note-title').textContent.toLowerCase();
-    const content = item.querySelector('.note-preview').textContent.toLowerCase();
+  noteCards.forEach(card => {
+    const title = card.querySelector('.note-title').textContent.toLowerCase();
+    const content = card.querySelector('.note-excerpt').textContent.toLowerCase();
     
     if (title.includes(searchTerm) || content.includes(searchTerm)) {
-      item.style.display = '';
+      card.style.display = 'block';
     } else {
-      item.style.display = 'none';
+      card.style.display = 'none';
     }
   });
 }
 
-// 离线保存笔记
-function saveNoteOffline(note) {
-  // 这里应该实现IndexedDB存储
-  // 简单起见，这里使用localStorage作为示例
-  let offlineNotes = JSON.parse(localStorage.getItem('offline-notes') || '[]');
-  
-  // 检查是否已存在，如果是则更新
-  const existingIndex = offlineNotes.findIndex(n => n.id === note.id);
-  if (existingIndex >= 0) {
-    offlineNotes[existingIndex] = note;
-  } else {
-    offlineNotes.push(note);
-  }
-  
-  localStorage.setItem('offline-notes', JSON.stringify(offlineNotes));
-  
-  // 如果支持后台同步，则注册同步任务
-  if ('serviceWorker' in navigator && 'SyncManager' in window) {
-    navigator.serviceWorker.ready
-      .then(registration => {
-        registration.sync.register('sync-notes');
-      })
-      .catch(err => console.error('同步注册失败:', err));
-  }
-}
-
-// 工具函数：debounce
+// 防抖函数
 function debounce(func, wait) {
   let timeout;
   return function(...args) {

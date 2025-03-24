@@ -5,13 +5,9 @@
 // 缓存名称 - 更新版本号会清除旧缓存
 const CACHE_NAME = 'thoughtgrove-v1';
 
-// 需要缓存的资源
+// 需要缓存的资源 - 仅保留基本UI资源，不缓存页面内容
 const RESOURCES_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/login',
-  '/register',
-  '/static/css/main.css',
+  '/static/css/styles.css',
   '/static/js/main.js',
   '/static/icons/favicon.ico',
   '/static/icons/icon-192x192.png',
@@ -59,55 +55,48 @@ self.addEventListener('activate', event => {
   );
 });
 
-// 请求拦截策略
+// 请求拦截策略 - 简化版，仅缓存静态资源，不处理离线
 self.addEventListener('fetch', event => {
   // 忽略非GET请求
   if (event.request.method !== 'GET') return;
   
-  // 忽略API请求
+  // 忽略API请求和HTML页面
   if (event.request.url.includes('/api/')) return;
   if (event.request.url.includes('/auth/')) return;
+  if (event.request.headers.get('accept').includes('text/html')) return;
   
-  event.respondWith(
-    // 尝试从缓存获取
-    caches.match(event.request)
-      .then(cachedResponse => {
-        // 如果存在缓存，返回缓存的资源
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-        
-        // 否则请求网络
-        return fetch(event.request)
-          .then(response => {
-            // 确保响应有效
-            if (!response || response.status !== 200 || response.type !== 'basic') {
+  // 只处理静态资源
+  if (event.request.url.includes('/static/')) {
+    event.respondWith(
+      caches.match(event.request)
+        .then(cachedResponse => {
+          // 如果存在缓存，返回缓存的资源
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          
+          // 否则请求网络
+          return fetch(event.request)
+            .then(response => {
+              // 确保响应有效
+              if (!response || response.status !== 200 || response.type !== 'basic') {
+                return response;
+              }
+              
+              // 克隆响应，因为响应流只能使用一次
+              const responseToCache = response.clone();
+              
+              // 缓存网络响应
+              caches.open(CACHE_NAME)
+                .then(cache => {
+                  cache.put(event.request, responseToCache);
+                });
+              
               return response;
-            }
-            
-            // 克隆响应，因为响应流只能使用一次
-            const responseToCache = response.clone();
-            
-            // 缓存网络响应
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                cache.put(event.request, responseToCache);
-              });
-            
-            return response;
-          })
-          .catch(error => {
-            console.log('Service Worker: 获取资源失败', error);
-            
-            // 如果是HTML页面请求失败，返回离线页面
-            if (event.request.headers.get('accept').includes('text/html')) {
-              return caches.match('/offline.html');
-            }
-            
-            return new Response('网络连接失败，请检查您的网络连接');
-          });
-      })
-  );
+            });
+        })
+    );
+  }
 });
 
 // 推送通知事件
