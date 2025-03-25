@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // 注册Service Worker
 function registerServiceWorker() {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/static/sw.js')
+    navigator.serviceWorker.register('/sw.js')
       .then(registration => {
         console.log('Service Worker 注册成功，作用域：', registration.scope);
       })
@@ -29,6 +29,9 @@ function registerServiceWorker() {
 
 // 初始化UI组件
 function initUI() {
+  // 更新导航菜单显示
+  updateNavigation();
+  
   // 高亮当前导航项
   highlightCurrentNavItem();
   
@@ -42,6 +45,21 @@ function initUI() {
   if (document.querySelector('#note-editor')) {
     initNoteEditor();
   }
+}
+
+// 更新导航菜单显示
+function updateNavigation() {
+  const isAuthenticated = !!localStorage.getItem('access_token');
+  const authLinks = document.querySelectorAll('.auth-link');
+  
+  authLinks.forEach(link => {
+    const requiresAuth = link.getAttribute('data-auth') === 'true';
+    if (requiresAuth === isAuthenticated) {
+      link.style.display = '';
+    } else {
+      link.style.display = 'none';
+    }
+  });
 }
 
 // 设置事件监听器
@@ -91,8 +109,9 @@ function highlightCurrentNavItem() {
 
 // 初始化主题切换
 function initThemeToggle() {
-  const themeToggle = document.querySelector('#theme-toggle');
-  if (!themeToggle) return;
+  const themeToggleBtn = document.getElementById('theme-toggle');
+  const themeToggleBtnAuth = document.getElementById('theme-toggle-auth');
+  const buttons = [themeToggleBtn, themeToggleBtnAuth];
   
   // 读取用户设置的主题或系统主题
   const savedTheme = localStorage.getItem('theme');
@@ -101,17 +120,22 @@ function initThemeToggle() {
   // 设置初始主题
   if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
     document.documentElement.classList.add('dark-theme');
-    themeToggle.checked = true;
   }
   
   // 监听主题切换
-  themeToggle.addEventListener('change', () => {
-    if (themeToggle.checked) {
-      document.documentElement.classList.add('dark-theme');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark-theme');
-      localStorage.setItem('theme', 'light');
+  buttons.forEach(btn => {
+    if (btn) {
+      btn.addEventListener('click', () => {
+        const isDark = document.documentElement.classList.toggle('dark-theme');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      });
+    }
+  });
+  
+  // 监听系统主题变化
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    if (!localStorage.getItem('theme')) {
+      document.documentElement.classList.toggle('dark-theme', e.matches);
     }
   });
 }

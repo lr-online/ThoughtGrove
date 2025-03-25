@@ -186,23 +186,55 @@
         <div class="logo">
           <a href="/">拙园</a>
         </div>
-        <nav class="nav">
-          <a href="/" class="active">首页</a>
+        <!-- 登录后显示的主导航 -->
+        <nav class="main-nav auth-link" data-auth="true" style="display: none;">
           <a href="/notes/new">新建笔记</a>
-          <a href="/about">关于</a>
-          <a href="/profile" id="profile-link">个人中心</a>
-          <a href="/login" id="login-link">登录</a>
-          <a href="/register" id="register-link">注册</a>
-          <a href="#" id="logout-link" style="display: none;">退出</a>
+          <a href="/notes">笔记列表</a>
         </nav>
-        <div class="theme-toggle-wrapper">
-          <span>🌙</span>
-          <label class="theme-toggle">
-            <input type="checkbox" id="theme-toggle">
-            <span class="slider"></span>
-          </label>
-          <span>☀️</span>
+        <!-- 右侧操作区 -->
+        <div class="header-actions">
+          <!-- 未登录状态显示 -->
+          <div class="auth-buttons auth-link" data-auth="false">
+            <button id="theme-toggle" class="theme-toggle-btn" title="切换主题">
+              <svg class="theme-icon sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+              <svg class="theme-icon moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </button>
+          </div>
+          <!-- 登录状态显示 -->
+          <div class="user-actions auth-link" data-auth="true" style="display: none;">
+            <a href="/profile" class="btn btn-text">个人中心</a>
+            <a href="#" id="logout-link" class="btn btn-text">退出</a>
+            <button id="theme-toggle-auth" class="theme-toggle-btn" title="切换主题">
+              <svg class="theme-icon sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+              <svg class="theme-icon moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </button>
+          </div>
         </div>
+        <!-- 移动端菜单按钮 -->
         <button class="mobile-menu-toggle" id="menu-toggle">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="3" y1="12" x2="21" y2="12"></line>
@@ -216,13 +248,12 @@
   
   <!-- 移动端导航菜单 -->
   <div id="mobile-menu" class="hidden">
-    <a href="/" class="active">首页</a>
-    <a href="/notes/new">新建笔记</a>
-    <a href="/about">关于</a>
-    <a href="/profile" id="mobile-profile-link">个人中心</a>
-    <a href="/login" id="mobile-login-link">登录</a>
-    <a href="/register" id="mobile-register-link">注册</a>
-    <a href="#" id="mobile-logout-link" style="display: none;">退出</a>
+    <div class="auth-link" data-auth="true" style="display: none;">
+      <a href="/notes/new">新建笔记</a>
+      <a href="/notes">笔记列表</a>
+      <a href="/profile">个人中心</a>
+      <a href="#" id="mobile-logout-link">退出</a>
+    </div>
   </div>
   
   <!-- 主要内容 -->
@@ -236,8 +267,8 @@
             一个简洁优雅的个人笔记和思考整理工具，让您随时随地记录灵感，整理思绪。
           </p>
           <div style="margin-top: 2rem;">
-            <a href="/register" class="btn btn-lg">立即开始</a>
-            <a href="/about" class="btn btn-outline btn-lg" style="margin-left: 1rem;">了解更多</a>
+            <a href="/login" class="btn btn-lg">立即登录</a>
+            <a href="https://github.com/lr-online/ThoughtGrove" class="btn btn-outline btn-lg" style="margin-left: 1rem;">了解更多</a>
           </div>
         </div>
         

@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
+from fastapi.responses import FileResponse
 
 from thoughtgrove.api.auth import router as auth_router
 from thoughtgrove.api.users import router as users_router
@@ -38,6 +39,11 @@ app.add_middleware(
 # 挂载静态文件目录
 static_dir = Path(__file__).parent.parent / "static"
 app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
+# 添加Service Worker路由
+@app.get("/sw.js")
+async def service_worker():
+    return FileResponse(static_dir / "sw.js", media_type="application/javascript")
 
 # 注册API路由
 app.include_router(auth_router)
