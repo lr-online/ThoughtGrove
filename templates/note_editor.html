@@ -4,8 +4,12 @@
 {% block description %}编辑您的笔记内容{% endblock %}
 
 {% block styles %}
+<!-- 添加SimpleMDE的样式 -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
 <style>
   .editor-container {
+    max-width: 900px;
+    margin: 0 auto;
     padding: 2rem 0;
   }
   
@@ -19,6 +23,7 @@
   .editor-actions {
     display: flex;
     gap: 1rem;
+    margin-top: 1.5rem;
   }
   
   .note-form {
@@ -58,11 +63,42 @@
     box-shadow: 0 0 0 2px rgba(var(--color-accent-rgb), 0.2);
   }
   
-  .note-textarea {
-    min-height: 300px;
-    resize: vertical;
-    line-height: 1.8;
-    font-family: inherit;
+  /* SimpleMDE自定义样式 */
+  .editor-toolbar {
+    border-color: var(--color-border);
+    background-color: var(--color-bg-secondary);
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+  }
+  
+  .editor-toolbar button {
+    color: var(--color-text-primary) !important;
+  }
+  
+  .editor-toolbar button:hover, 
+  .editor-toolbar button.active {
+    background-color: rgba(var(--color-accent-rgb), 0.1);
+    border-color: var(--color-border);
+  }
+  
+  .CodeMirror {
+    border-color: var(--color-border);
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    height: 350px !important;
+  }
+  
+  .CodeMirror, .CodeMirror-scroll {
+    min-height: 350px;
+  }
+  
+  .CodeMirror {
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-secondary);
+  }
+  
+  .editor-preview {
+    background-color: var(--color-bg-primary);
   }
   
   .status-indicator {
@@ -93,6 +129,13 @@
     display: inline-flex;
     align-items: center;
     margin-bottom: 1rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  
+  .editor-back-button:hover {
+    transform: translateX(-3px);
+    text-decoration: none;
   }
   
   .editor-back-button svg {
@@ -106,6 +149,23 @@
     border-radius: 8px;
     margin-bottom: 1.5rem;
     display: none;
+  }
+  
+  /* 标题输入增强样式 */
+  .title-input {
+    font-size: 1.5rem;
+    font-weight: 500;
+    padding: 0.75rem 1rem;
+    border-width: 2px;
+  }
+  
+  /* 按钮增强样式 */
+  .btn {
+    transition: all 0.2s ease;
+  }
+  
+  .btn:hover {
+    transform: translateY(-2px);
   }
   
   @keyframes spin {
@@ -132,18 +192,24 @@
   <div id="error-message" class="error-message"></div>
   
   <form id="note-form" class="note-form">
+    <!-- 添加隐藏字段存储笔记ID -->
+    <input type="hidden" id="note-id" value="">
+    
     <div class="form-group">
       <label for="note-title" class="form-label">标题</label>
-      <input type="text" id="note-title" name="title" class="form-control" placeholder="输入笔记标题" required>
+      <input type="text" id="note-title" name="title" class="form-control title-input" placeholder="输入笔记标题" required>
     </div>
     
     <div class="form-group">
       <label for="note-content" class="form-label">内容</label>
-      <textarea id="note-content" name="content" class="form-control note-textarea" placeholder="输入笔记内容" required></textarea>
+      <textarea id="note-content" name="content" class="form-control" placeholder="输入笔记内容" required></textarea>
+      
+      <!-- 添加一个隐藏字段用于全局js函数 -->
+      <textarea id="note-editor" name="editor-content" style="display: none;"></textarea>
     </div>
     
     <div class="editor-actions">
-      <button type="submit" class="btn">保存笔记</button>
+      <button type="submit" class="btn" id="save-note-btn">保存笔记</button>
       <a href="/" class="btn btn-outline">取消</a>
       
       <div id="saving-indicator" class="saving-indicator">
@@ -160,6 +226,8 @@
 {% endblock %}
 
 {% block scripts %}
+<!-- 引入SimpleMDE -->
+<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     // 检查用户是否已登录
@@ -174,9 +242,36 @@
     const pageTitleElement = document.getElementById('page-title');
     const noteTitleElement = document.getElementById('note-title');
     const noteContentElement = document.getElementById('note-content');
+    const hiddenEditorElement = document.getElementById('note-editor'); // 隐藏字段
+    const noteIdElement = document.getElementById('note-id'); // 隐藏的ID字段
     const errorMessageElement = document.getElementById('error-message');
     const savingIndicator = document.getElementById('saving-indicator');
     const savedIndicator = document.getElementById('saved-indicator');
+    const saveButton = document.getElementById('save-note-btn');
+    
+    // 初始化Markdown编辑器
+    const simplemde = new SimpleMDE({
+      element: noteContentElement,
+      spellChecker: false,
+      autofocus: false,
+      placeholder: "在这里用Markdown编写你的笔记...",
+      toolbar: [
+        "bold", "italic", "heading", "|", 
+        "quote", "unordered-list", "ordered-list", "|", 
+        "link", "image", "|", 
+        "preview", "side-by-side", "fullscreen", "|",
+        "guide"
+      ],
+      status: ['lines', 'words'],
+      renderingConfig: {
+        codeSyntaxHighlighting: true,
+      }
+    });
+    
+    // 设置主题颜色，适应暗色模式
+    if (document.documentElement.getAttribute('data-theme') === 'dark') {
+      // 这里不需要修改SimpleMDE的样式，CSS已经处理
+    }
     
     // 获取URL参数
     const urlParams = new URLSearchParams(window.location.search);
@@ -185,14 +280,43 @@
     // 如果有笔记ID，则加载笔记数据
     if (noteId) {
       pageTitleElement.textContent = '编辑笔记';
+      noteIdElement.value = noteId; // 设置隐藏的ID字段
       loadNote(noteId);
+    } else {
+      noteIdElement.value = 'new'; // 设置为新建状态
     }
     
-    // 表单提交事件
+    // 使用单独的保存按钮事件，避免与全局事件冲突
+    saveButton.addEventListener('click', function(event) {
+      event.preventDefault();
+      saveNote();
+    });
+    
+    // 移除表单的默认提交处理，避免冲突
     noteForm.addEventListener('submit', function(event) {
       event.preventDefault();
       saveNote();
     });
+    
+    // 自动保存功能
+    let autoSaveTimer;
+    simplemde.codemirror.on("change", function() {
+      clearTimeout(autoSaveTimer);
+      autoSaveTimer = setTimeout(function() {
+        const content = simplemde.value();
+        localStorage.setItem('draft-note-content', content);
+        
+        // 同步到隐藏字段，保持与main.js的兼容性
+        hiddenEditorElement.value = content;
+      }, 1000);
+    });
+    
+    // 加载草稿
+    const savedDraftContent = localStorage.getItem('draft-note-content');
+    if (!noteId && savedDraftContent && simplemde.value() === '') {
+      simplemde.value(savedDraftContent);
+      hiddenEditorElement.value = savedDraftContent; // 同步到隐藏字段
+    }
     
     // 加载笔记
     async function loadNote(id) {
@@ -211,7 +335,8 @@
         
         // 填充表单
         noteTitleElement.value = note.title;
-        noteContentElement.value = note.content;
+        simplemde.value(note.content);
+        hiddenEditorElement.value = note.content; // 同步到隐藏字段
       } catch (error) {
         console.error('加载笔记失败:', error);
         showError('加载笔记失败，请稍后再试');
@@ -226,7 +351,10 @@
       errorMessageElement.style.display = 'none';
       
       const title = noteTitleElement.value.trim();
-      const content = noteContentElement.value.trim();
+      const content = simplemde.value().trim();
+      
+      // 同步到隐藏字段，保持与main.js的兼容性
+      hiddenEditorElement.value = content;
       
       // 验证表单
       if (!title || !content) {
@@ -265,12 +393,18 @@
         savingIndicator.style.display = 'none';
         savedIndicator.style.display = 'inline-flex';
         
+        // 清除草稿
+        if (!noteId) {
+          localStorage.removeItem('draft-note-content');
+        }
+        
         // 如果是新建笔记，保存成功后获取ID并更新URL
         if (!noteId) {
           const result = await response.json();
           if (result.id) {
             history.replaceState(null, '', `/notes/edit?id=${result.id}`);
             noteId = result.id;
+            noteIdElement.value = result.id; // 更新隐藏的ID字段
             pageTitleElement.textContent = '编辑笔记';
           }
         }
