@@ -145,6 +145,37 @@
     display: flex;
     gap: 0.75rem;
   }
+  
+  /* 添加可点击样式 */
+  .note-title-link {
+    color: var(--color-text-primary);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  .note-title-link:hover {
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+  
+  .note-content-link {
+    display: block;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  
+  .note-content-link:hover {
+    text-decoration: none;
+  }
+  
+  .card-clickable {
+    cursor: pointer;
+  }
+  
+  .card-header, .card-body {
+    position: relative;
+    z-index: 1;
+  }
 </style>
 {% endblock %}
 
@@ -361,17 +392,51 @@
       const template = document.getElementById('note-template');
       const noteElement = document.importNode(template.content, true).firstElementChild;
       
+      // 添加可点击样式
+      noteElement.classList.add('card-clickable');
+      
       // 设置笔记内容
-      noteElement.querySelector('.note-title').textContent = note.title;
-      noteElement.querySelector('.note-preview').textContent = note.content.substring(0, 200) + (note.content.length > 200 ? '...' : '');
+      const titleElement = noteElement.querySelector('.note-title');
+      const previewElement = noteElement.querySelector('.note-preview');
+      
+      // 创建标题链接
+      const titleLink = document.createElement('a');
+      titleLink.href = `/notes/${note.id}`;
+      titleLink.className = 'note-title-link';
+      titleLink.textContent = note.title;
+      titleElement.innerHTML = ''; // 清空标题
+      titleElement.appendChild(titleLink);
+      
+      // 创建内容链接
+      const contentLink = document.createElement('a');
+      contentLink.href = `/notes/${note.id}`;
+      contentLink.className = 'note-content-link';
+      contentLink.textContent = note.content.substring(0, 200) + (note.content.length > 200 ? '...' : '');
+      previewElement.innerHTML = ''; // 清空预览
+      previewElement.appendChild(contentLink);
       
       // 格式化日期
       const date = new Date(note.updated_at || note.created_at);
       noteElement.querySelector('.note-date').textContent = `更新于 ${date.toLocaleDateString('zh-CN')}`;
       
       // 设置链接和ID
-      noteElement.querySelector('.edit-note-btn').href = `/notes/${note.id}`;
+      noteElement.querySelector('.edit-note-btn').href = `/notes/edit?id=${note.id}`;
       noteElement.querySelector('.delete-note-btn').dataset.noteId = note.id;
+      
+      // 添加卡片点击事件（整体可点击）
+      const cardHeader = noteElement.querySelector('.card-header');
+      const cardBody = noteElement.querySelector('.card-body');
+      
+      cardHeader.addEventListener('click', function(e) {
+        // 阻止点击按钮时的冒泡
+        if (!e.target.closest('.note-actions')) {
+          window.location.href = `/notes/${note.id}`;
+        }
+      });
+      
+      cardBody.addEventListener('click', function() {
+        window.location.href = `/notes/${note.id}`;
+      });
       
       return noteElement;
     }
