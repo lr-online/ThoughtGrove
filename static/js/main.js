@@ -104,35 +104,70 @@ function highlightCurrentNavItem() {
   });
 }
 
-// 初始化主题切换
+// 主题切换功能
 function initThemeToggle() {
-  const themeToggleBtn = document.getElementById('theme-toggle');
-  const themeToggleBtnAuth = document.getElementById('theme-toggle-auth');
-  const buttons = [themeToggleBtn, themeToggleBtnAuth];
+  const themeToggleButtons = document.querySelectorAll('#theme-toggle, #theme-toggle-auth');
   
-  // 读取用户设置的主题或系统主题
+  // 根据localStorage或系统偏好设置初始主题
+  const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
   const savedTheme = localStorage.getItem('theme');
-  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const initialTheme = savedTheme || (prefersDarkMode ? 'dark' : 'light');
   
   // 设置初始主题
-  if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-    document.documentElement.classList.add('dark-theme');
-  }
+  document.documentElement.setAttribute('data-theme', initialTheme);
   
-  // 监听主题切换
-  buttons.forEach(btn => {
-    if (btn) {
-      btn.addEventListener('click', () => {
-        const isDark = document.documentElement.classList.toggle('dark-theme');
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-      });
-    }
+  // 更新主题图标显示
+  updateThemeIcons(initialTheme);
+  
+  // 监听主题切换按钮点击
+  themeToggleButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      
+      // 更新DOM和本地存储
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      
+      // 更新图标
+      updateThemeIcons(newTheme);
+    });
+  });
+}
+
+// 更新主题图标显示
+function updateThemeIcons(theme) {
+  document.querySelectorAll('.sun-icon').forEach(icon => {
+    icon.style.display = theme === 'dark' ? 'block' : 'none';
   });
   
-  // 监听系统主题变化
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-    if (!localStorage.getItem('theme')) {
-      document.documentElement.classList.toggle('dark-theme', e.matches);
+  document.querySelectorAll('.moon-icon').forEach(icon => {
+    icon.style.display = theme === 'dark' ? 'none' : 'block';
+  });
+}
+
+// 根据登录状态显示/隐藏元素
+function updateUIByAuthState() {
+  const token = localStorage.getItem('access_token');
+  const authEls = document.querySelectorAll('[data-auth]');
+  
+  authEls.forEach(el => {
+    const forAuthState = el.getAttribute('data-auth') === 'true';
+    
+    if ((token && forAuthState) || (!token && !forAuthState)) {
+      el.style.display = '';
+    } else {
+      el.style.display = 'none';
+    }
+  });
+
+  // 添加活动页面标记
+  const currentPath = window.location.pathname;
+  document.querySelectorAll('.nav-link').forEach(link => {
+    const href = link.getAttribute('href');
+    if (currentPath === href || 
+        (href !== '/' && currentPath.startsWith(href))) {
+      link.classList.add('active');
     }
   });
 }

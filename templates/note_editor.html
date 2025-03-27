@@ -1,302 +1,296 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>编辑笔记 - 拙园</title>
-  <link rel="stylesheet" href="/static/css/styles.css">
-  <link rel="manifest" href="/static/manifest.json">
-  <link rel="icon" href="/static/images/favicon.ico">
-  <meta name="theme-color" content="#536b57">
-  <style>
-    .page-container {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-    
-    .editor-container {
-      flex: 1;
-      padding: var(--spacing-lg) 0;
-    }
-    
-    .editor-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: var(--spacing-lg);
-    }
-    
-    .editor-title {
-      font-family: var(--font-serif);
-      color: var(--color-primary);
-      font-size: 1.8rem;
-    }
-    
-    .editor-actions {
-      display: flex;
-      gap: var(--spacing-md);
-    }
-    
-    .title-input {
-      font-size: 1.5rem;
-      padding: var(--spacing-md);
-      margin-bottom: var(--spacing-lg);
-      border: 1px solid #ddd;
-      border-radius: var(--radius-md);
-      width: 100%;
-      font-family: var(--font-sans);
-    }
-    
-    .content-editor {
-      width: 100%;
-      min-height: 400px;
-      padding: var(--spacing-md);
-      border: 1px solid #ddd;
-      border-radius: var(--radius-md);
-      font-family: var(--font-sans);
-      line-height: 1.6;
-      resize: vertical;
-    }
-    
-    .title-input:focus,
-    .content-editor:focus {
-      outline: none;
-      border-color: var(--color-primary);
-    }
-    
-    .error-message {
-      color: var(--color-error);
-      margin-top: var(--spacing-md);
-      padding: var(--spacing-md);
-      background-color: rgba(158, 75, 55, 0.1);
-      border-radius: var(--radius-sm);
-      display: none;
-    }
-    
-    .saving-indicator {
-      display: flex;
-      align-items: center;
-      margin-left: var(--spacing-md);
-      color: var(--color-secondary);
-      font-size: 0.9rem;
-    }
-    
-    .saving-spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(0, 0, 0, 0.1);
-      border-radius: 50%;
-      border-top: 2px solid var(--color-primary);
-      animation: spin 1s linear infinite;
-      margin-right: var(--spacing-xs);
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    /* 响应式调整 */
-    @media (max-width: 768px) {
-      .editor-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: var(--spacing-md);
-      }
-      
-      .editor-actions {
-        width: 100%;
-        justify-content: space-between;
-      }
-    }
-  </style>
-</head>
-<body>
-  <div class="page-container">
-    <nav class="navbar">
-      <div class="container navbar-container">
-        <a href="/" class="navbar-brand">拙园</a>
-        
-        <div class="mobile-menu-toggle">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-          </svg>
-        </div>
-        
-        <ul class="navbar-menu">
-          <li class="navbar-item"><a href="/">笔记</a></li>
-          <li class="navbar-item"><a href="#" id="logoutButton">退出</a></li>
-        </ul>
-      </div>
-    </nav>
-    
-    <main class="editor-container">
-      <div class="container">
-        <div class="editor-header">
-          <h1 class="editor-title" id="pageTitle">创建新笔记</h1>
-          
-          <div class="editor-actions">
-            <button id="cancelButton" class="btn btn-secondary">取消</button>
-            <button id="saveButton" class="btn btn-primary">保存笔记</button>
-            <div id="savingIndicator" class="saving-indicator" style="display: none;">
-              <div class="saving-spinner"></div>
-              <span>正在保存...</span>
-            </div>
-          </div>
-        </div>
-        
-        <form id="noteForm">
-          <input type="text" id="titleInput" class="title-input" placeholder="请输入标题..." required>
-          <textarea id="contentEditor" class="content-editor" placeholder="开始记录您的思想..." required></textarea>
-          <div id="errorMessage" class="error-message"></div>
-        </form>
-      </div>
-    </main>
-    
-    <footer class="site-footer">
-      <div class="container footer-content">
-        <div class="footer-brand">拙园</div>
-        
-        <div class="footer-nav">
-          <a href="#" class="footer-link">关于</a>
-          <a href="#" class="footer-link">隐私政策</a>
-          <a href="#" class="footer-link">帮助</a>
-        </div>
-      </div>
-    </footer>
+{% extends "layout.html" %}
+
+{% block title %}编辑笔记 - 拙园{% endblock %}
+{% block description %}编辑您的笔记内容{% endblock %}
+
+{% block styles %}
+<style>
+  .editor-container {
+    padding: 2rem 0;
+  }
+  
+  .editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .editor-actions {
+    display: flex;
+    gap: 1rem;
+  }
+  
+  .note-form {
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    box-shadow: var(--shadow-md);
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--color-text-primary);
+    font-weight: 500;
+  }
+  
+  .form-control {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    transition: border-color 0.3s ease;
+  }
+  
+  .form-control:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 2px rgba(var(--color-accent-rgb), 0.2);
+  }
+  
+  .note-textarea {
+    min-height: 300px;
+    resize: vertical;
+    line-height: 1.8;
+    font-family: inherit;
+  }
+  
+  .status-indicator {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    margin-left: 1rem;
+  }
+  
+  .saving-indicator {
+    display: none;
+    align-items: center;
+  }
+  
+  .saving-indicator .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(var(--color-accent-rgb), 0.3);
+    border-top-color: var(--color-accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 0.5rem;
+  }
+  
+  .editor-back-button {
+    color: var(--color-accent);
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .editor-back-button svg {
+    margin-right: 0.5rem;
+  }
+  
+  .error-message {
+    color: var(--color-error);
+    padding: 1rem;
+    background-color: rgba(var(--color-error-rgb), 0.1);
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    display: none;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="editor-container">
+  <a href="/" class="editor-back-button">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="19" y1="12" x2="5" y2="12"></line>
+      <polyline points="12 19 5 12 12 5"></polyline>
+    </svg>
+    返回笔记列表
+  </a>
+  
+  <div class="editor-header">
+    <h1 id="page-title">新建笔记</h1>
   </div>
   
-  <script src="/static/js/main.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // 检查用户是否已登录
-      if (!auth.isAuthenticated()) {
-        window.location.href = '/login';
+  <div id="error-message" class="error-message"></div>
+  
+  <form id="note-form" class="note-form">
+    <div class="form-group">
+      <label for="note-title" class="form-label">标题</label>
+      <input type="text" id="note-title" name="title" class="form-control" placeholder="输入笔记标题" required>
+    </div>
+    
+    <div class="form-group">
+      <label for="note-content" class="form-label">内容</label>
+      <textarea id="note-content" name="content" class="form-control note-textarea" placeholder="输入笔记内容" required></textarea>
+    </div>
+    
+    <div class="editor-actions">
+      <button type="submit" class="btn">保存笔记</button>
+      <a href="/" class="btn btn-outline">取消</a>
+      
+      <div id="saving-indicator" class="saving-indicator">
+        <div class="spinner"></div>
+        <span>正在保存...</span>
+      </div>
+      
+      <div id="saved-indicator" class="status-indicator" style="display: none;">
+        已保存
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // 检查用户是否已登录
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      window.location.href = '/login?redirect=' + encodeURIComponent(window.location.pathname);
+      return;
+    }
+    
+    // 获取DOM元素
+    const noteForm = document.getElementById('note-form');
+    const pageTitleElement = document.getElementById('page-title');
+    const noteTitleElement = document.getElementById('note-title');
+    const noteContentElement = document.getElementById('note-content');
+    const errorMessageElement = document.getElementById('error-message');
+    const savingIndicator = document.getElementById('saving-indicator');
+    const savedIndicator = document.getElementById('saved-indicator');
+    
+    // 获取URL参数
+    const urlParams = new URLSearchParams(window.location.search);
+    const noteId = urlParams.get('id');
+    
+    // 如果有笔记ID，则加载笔记数据
+    if (noteId) {
+      pageTitleElement.textContent = '编辑笔记';
+      loadNote(noteId);
+    }
+    
+    // 表单提交事件
+    noteForm.addEventListener('submit', function(event) {
+      event.preventDefault();
+      saveNote();
+    });
+    
+    // 加载笔记
+    async function loadNote(id) {
+      try {
+        const response = await fetch(`/api/notes/${id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error('获取笔记失败');
+        }
+        
+        const note = await response.json();
+        
+        // 填充表单
+        noteTitleElement.value = note.title;
+        noteContentElement.value = note.content;
+      } catch (error) {
+        console.error('加载笔记失败:', error);
+        showError('加载笔记失败，请稍后再试');
+      }
+    }
+    
+    // 保存笔记
+    async function saveNote() {
+      // 显示保存中状态
+      savingIndicator.style.display = 'flex';
+      savedIndicator.style.display = 'none';
+      errorMessageElement.style.display = 'none';
+      
+      const title = noteTitleElement.value.trim();
+      const content = noteContentElement.value.trim();
+      
+      // 验证表单
+      if (!title || !content) {
+        showError('请填写标题和内容');
+        savingIndicator.style.display = 'none';
         return;
       }
       
-      // 获取DOM元素
-      const noteForm = document.getElementById('noteForm');
-      const titleInput = document.getElementById('titleInput');
-      const contentEditor = document.getElementById('contentEditor');
-      const saveButton = document.getElementById('saveButton');
-      const cancelButton = document.getElementById('cancelButton');
-      const errorMessage = document.getElementById('errorMessage');
-      const savingIndicator = document.getElementById('savingIndicator');
-      const pageTitle = document.getElementById('pageTitle');
-      
-      // 获取URL参数
-      const urlParams = new URLSearchParams(window.location.search);
-      const noteId = urlParams.get('id');
-      
-      // 是否为编辑模式
-      const isEditMode = !!noteId;
-      
-      // 如果是编辑模式，加载现有笔记
-      if (isEditMode) {
-        pageTitle.textContent = '编辑笔记';
-        loadExistingNote(noteId);
-      }
-      
-      // 取消按钮事件
-      cancelButton.addEventListener('click', function() {
-        window.location.href = '/';
-      });
-      
-      // 保存按钮事件
-      saveButton.addEventListener('click', async function() {
-        if (!validateForm()) {
-          return;
+      try {
+        let url = '/api/notes';
+        let method = 'POST';
+        
+        // 如果是编辑模式
+        if (noteId) {
+          url = `/api/notes/${noteId}`;
+          method = 'PUT';
         }
         
-        // 显示保存指示器
-        savingIndicator.style.display = 'flex';
-        saveButton.disabled = true;
+        const response = await fetch(url, {
+          method: method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            title: title,
+            content: content
+          })
+        });
         
-        const noteData = {
-          title: titleInput.value,
-          content: contentEditor.value
-        };
+        if (!response.ok) {
+          throw new Error('保存笔记失败');
+        }
         
-        try {
-          let result;
-          
-          if (isEditMode) {
-            // 更新现有笔记
-            result = await notes.updateNote(noteId, noteData);
-          } else {
-            // 创建新笔记
-            result = await notes.createNote(noteData);
+        // 显示已保存状态
+        savingIndicator.style.display = 'none';
+        savedIndicator.style.display = 'inline-flex';
+        
+        // 如果是新建笔记，保存成功后获取ID并更新URL
+        if (!noteId) {
+          const result = await response.json();
+          if (result.id) {
+            history.replaceState(null, '', `/notes/edit?id=${result.id}`);
+            noteId = result.id;
+            pageTitleElement.textContent = '编辑笔记';
           }
-          
-          if (result) {
-            // 保存成功，返回笔记列表
-            window.location.href = '/';
-          } else {
-            throw new Error('操作失败');
-          }
-        } catch (error) {
-          console.error('保存笔记失败:', error);
-          showError('保存笔记失败，请重试');
-          
-          // 隐藏保存指示器
-          savingIndicator.style.display = 'none';
-          saveButton.disabled = false;
-        }
-      });
-      
-      // 加载现有笔记
-      async function loadExistingNote(id) {
-        try {
-          const note = await notes.getNote(id);
-          
-          if (note) {
-            titleInput.value = note.title;
-            contentEditor.value = note.content;
-          } else {
-            showError('找不到指定的笔记');
-          }
-        } catch (error) {
-          console.error('加载笔记失败:', error);
-          showError('加载笔记失败，请重试');
-        }
-      }
-      
-      // 验证表单
-      function validateForm() {
-        let isValid = true;
-        
-        if (!titleInput.value.trim()) {
-          showError('请输入笔记标题');
-          isValid = false;
-        } else if (!contentEditor.value.trim()) {
-          showError('请输入笔记内容');
-          isValid = false;
         }
         
-        return isValid;
+        // 3秒后隐藏保存状态
+        setTimeout(function() {
+          savedIndicator.style.display = 'none';
+        }, 3000);
+      } catch (error) {
+        console.error('保存笔记失败:', error);
+        showError('保存笔记失败，请稍后再试');
+        savingIndicator.style.display = 'none';
       }
-      
-      // 显示错误消息
-      function showError(message) {
-        errorMessage.textContent = message;
-        errorMessage.style.display = 'block';
-        
-        // 5秒后自动隐藏
-        setTimeout(() => {
-          errorMessage.style.display = 'none';
-        }, 5000);
-      }
-      
-      // 注销按钮事件
-      document.getElementById('logoutButton').addEventListener('click', function(e) {
-        e.preventDefault();
-        auth.logout();
-      });
-    });
-  </script>
-</body>
-</html> 
+    }
+    
+    // 显示错误消息
+    function showError(message) {
+      errorMessageElement.textContent = message;
+      errorMessageElement.style.display = 'block';
+    }
+  });
+</script>
+{% endblock %} 

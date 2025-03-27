@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}拙园 - 个人笔记与思考整理{% endblock %}</title>
+  <meta name="description" content="{% block description %}拙园是一个简洁优雅的个人笔记和思考整理工具{% endblock %}">
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <link rel="manifest" href="/static/manifest.json">
+  <link rel="icon" href="/static/images/favicon.ico">
+  <meta name="theme-color" content="#a2432e">
+  <!-- 添加PWA相关标签 -->
+  <link rel="apple-touch-icon" href="/static/images/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  {% block styles %}{% endblock %}
+  <style>
+    /* 添加导航栏样式优化 */
+    .header {
+      border-bottom: 1px solid var(--color-border);
+      background-color: var(--color-bg-primary);
+      padding: 0.75rem 0;
+    }
+    
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-right: 2rem;
+    }
+    
+    .logo a {
+      color: var(--color-text-primary);
+      text-decoration: none;
+    }
+    
+    .main-nav {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-right: auto;
+    }
+    
+    .main-nav a {
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.5rem 0;
+      position: relative;
+      transition: color 0.2s ease;
+    }
+    
+    .main-nav a:hover {
+      color: var(--color-accent);
+    }
+    
+    .main-nav a.active {
+      color: var(--color-accent);
+    }
+    
+    .main-nav a.active:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background-color: var(--color-accent);
+    }
+    
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .user-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .theme-toggle-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0.5rem;
+      color: var(--color-text-secondary);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s ease;
+    }
+    
+    .theme-toggle-btn:hover {
+      background-color: var(--color-bg-secondary);
+      color: var(--color-accent);
+    }
+    
+    .auth-links {
+      display: flex;
+      gap: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- 头部导航 -->
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="logo">
+          <a href="/">拙园</a>
+        </div>
+        
+        <!-- 导航链接 -->
+        <nav class="main-nav">
+          <!-- 首页可以通过点击logo进入，关于暂时没有这个页面，所以暂时隐藏 -->
+          <!-- <a href="/" class="nav-link">首页</a>
+          <a href="/about" class="nav-link">关于</a> -->
+        </nav>
+        
+        <!-- 右侧操作区 -->
+        <div class="header-actions">
+          <!-- 未登录状态显示 -->
+          <div class="auth-link auth-links" data-auth="false">
+            <a href="/login" class="btn btn-text">登录</a>
+            <!-- <a href="/register" class="btn btn-outline">注册</a> --> <!-- 注册按钮可以通过点击登录按钮进入注册页面，所以暂时隐藏 -->
+            <button id="theme-toggle" class="theme-toggle-btn" title="切换主题">
+              <svg class="theme-icon sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+              <svg class="theme-icon moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </button>
+          </div>
+          
+          <!-- 登录状态显示 -->
+          <div class="user-actions auth-link" data-auth="true" style="display: none;">
+            <a href="/notes/new" class="btn btn-outline">新建笔记</a>
+            <a href="/profile" class="btn btn-text">个人中心</a>
+            <a href="#" id="logout-link" class="btn btn-text">退出</a>
+            <button id="theme-toggle-auth" class="theme-toggle-btn" title="切换主题">
+              <svg class="theme-icon sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"></circle>
+                <line x1="12" y1="1" x2="12" y2="3"></line>
+                <line x1="12" y1="21" x2="12" y2="23"></line>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                <line x1="1" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="12" x2="23" y2="12"></line>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+              </svg>
+              <svg class="theme-icon moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+  <!-- 主要内容 -->
+  <main class="content">
+    <div class="container">
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+  
+  <!-- 底部 -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div>&copy; 2024 拙园 ThoughtGrove</div>
+        <div class="footer-links">
+          <a href="/terms">使用条款</a>
+          <a href="/privacy">隐私政策</a>
+          <a href="/contact">联系我们</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- JavaScript -->
+  <script src="/static/js/main.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html> 

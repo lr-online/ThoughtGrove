@@ -1,213 +1,100 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>登录 - 拙园</title>
-  <meta name="description" content="登录拙园，记录和整理您的思考">
-  <link rel="stylesheet" href="/static/css/styles.css">
-  <link rel="manifest" href="/static/manifest.json">
-  <link rel="icon" href="/static/images/favicon.ico">
-  <meta name="theme-color" content="#a2432e">
-  <!-- 添加PWA相关标签 -->
-  <link rel="apple-touch-icon" href="/static/images/icon-192.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <style>
-    body {
-      background-color: var(--color-light);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-    
-    .login-container {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-    }
-    
-    .login-card {
-      background-color: white;
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-md);
-      width: 100%;
-      max-width: 400px;
-      padding: 2rem;
-    }
-    
-    .login-header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-    
-    .login-title {
-      font-family: var(--font-serif);
-      font-size: 2rem;
-      color: var(--color-primary);
-      margin-bottom: 0.5rem;
-    }
-    
-    .login-subtitle {
-      color: var(--color-secondary);
-      font-size: 1rem;
-    }
-    
-    .login-form {
-      margin-bottom: 1.5rem;
-    }
-    
-    .form-footer {
-      text-align: center;
-      margin-top: 1.5rem;
-      font-size: 0.9rem;
-    }
-    
-    .field-error {
-      color: var(--color-error);
-      font-size: 0.8rem;
-      margin-top: 0.25rem;
-    }
-    
-    .has-error {
-      border-color: var(--color-error) !important;
-    }
-    
-    .garden-decoration {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      z-index: -1;
-      opacity: 0.2;
-      pointer-events: none;
-    }
-    
-    @media (min-width: 768px) {
-      .garden-decoration {
-        opacity: 0.3;
-      }
-    }
-  </style>
-</head>
-<body>
-  <!-- 头部导航 -->
-  <header class="header">
-    <div class="container">
-      <div class="header-content">
-        <div class="logo">
-          <a href="/">拙园</a>
-        </div>
-        <nav class="nav">
-          <a href="/">首页</a>
-          <a href="/about">关于</a>
-          <a href="/login" class="active">登录</a>
-          <a href="/register">注册</a>
-        </nav>
-        <div class="theme-toggle-wrapper">
-          <span>🌙</span>
-          <label class="theme-toggle">
-            <input type="checkbox" id="theme-toggle">
-            <span class="slider"></span>
-          </label>
-          <span>☀️</span>
-        </div>
-        <button class="mobile-menu-toggle" id="menu-toggle">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-          </svg>
-        </button>
-      </div>
+{% extends "layout.html" %}
+
+{% block title %}登录 - 拙园{% endblock %}
+{% block description %}登录拙园，记录和整理您的思考{% endblock %}
+
+{% block styles %}
+<style>
+  .login-container {
+    padding: 3rem 1rem;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .login-card {
+    max-width: 450px;
+    width: 100%;
+  }
+  
+  .login-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .login-title {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .form-footer {
+    margin-top: 1.5rem;
+    text-align: center;
+  }
+  
+  .form-group-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+  <div class="card login-card">
+    <div class="card-header">
+      <h1 class="card-title login-title" style="text-align: center;">欢迎回来</h1>
     </div>
-  </header>
-  
-  <!-- 移动端导航菜单 -->
-  <div id="mobile-menu" class="hidden">
-    <a href="/">首页</a>
-    <a href="/about">关于</a>
-    <a href="/login" class="active">登录</a>
-    <a href="/register">注册</a>
-  </div>
-  
-  <!-- 主要内容 -->
-  <main class="content">
-    <div class="container">
-      <div class="flex justify-center">
-        <div class="card" style="max-width: 450px; width: 100%;">
-          <div class="card-header">
-            <h1 class="card-title" style="text-align: center;">欢迎回来</h1>
-          </div>
-          
-          <!-- 如果从注册页面跳转而来，显示成功消息 -->
-          {% if request.query_params.get('registered') == 'true' %}
-          <div class="alert alert-success">
-            注册成功！请使用您的账号登录。
-          </div>
-          {% endif %}
-          
-          <!-- 显示登录错误信息 -->
-          <div id="error-message" class="error-message hidden"></div>
-          
-          <form id="login-form" class="card-body">
-            <div class="form-group">
-              <label for="email" class="form-label">电子邮箱</label>
-              <input type="email" id="email" name="email" class="form-control" required>
-            </div>
-            
-            <div class="form-group">
-              <label for="password" class="form-label">密码</label>
-              <input type="password" id="password" name="password" class="form-control" required>
-            </div>
-            
-            <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
-              <div>
-                <input type="checkbox" id="remember-me" name="remember-me">
-                <label for="remember-me">记住我</label>
-              </div>
-              <a href="/forgot-password">忘记密码？</a>
-            </div>
-            
-            <button type="submit" class="btn w-full">登录</button>
-          </form>
-          
-          <div class="card-footer" style="text-align: center;">
-            <p>还没有账号？<a href="/register">立即注册</a></p>
-          </div>
-        </div>
-      </div>
+    
+    <!-- 如果从注册页面跳转而来，显示成功消息 -->
+    {% if request.query_params.get('registered') == 'true' %}
+    <div class="alert alert-success">
+      注册成功！请使用您的账号登录。
     </div>
-  </main>
-  
-  <!-- 底部 -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <div>&copy; 2024 拙园 ThoughtGrove</div>
-        <div class="footer-links">
-          <a href="/terms">使用条款</a>
-          <a href="/privacy">隐私政策</a>
-          <a href="/contact">联系我们</a>
-        </div>
+    {% endif %}
+    
+    <!-- 显示登录错误信息 -->
+    <div id="error-message" class="error-message hidden"></div>
+    
+    <form id="login-form" class="card-body">
+      <div class="form-group">
+        <label for="email" class="form-label">电子邮箱</label>
+        <input type="email" id="email" name="email" class="form-control" required>
       </div>
-    </div>
-  </footer>
-  
-  <!-- JavaScript -->
-  <script src="/static/js/main.js"></script>
-  <script>
-    // 检查登录状态，如果已登录则跳转到主页
-    document.addEventListener('DOMContentLoaded', function() {
-      const token = localStorage.getItem('access_token');
-      const redirectParam = new URLSearchParams(window.location.search).get('redirect');
       
-      if (token) {
-        window.location.href = redirectParam || '/';
-      }
-    });
-  </script>
-</body>
-</html> 
+      <div class="form-group">
+        <label for="password" class="form-label">密码</label>
+        <input type="password" id="password" name="password" class="form-control" required>
+      </div>
+      
+      <div class="form-group form-group-flex">
+        <div>
+          <input type="checkbox" id="remember-me" name="remember-me">
+          <label for="remember-me">记住我</label>
+        </div>
+        <a href="/forgot-password">忘记密码？</a>
+      </div>
+      
+      <button type="submit" class="btn w-full">登录</button>
+    </form>
+    
+    <div class="card-footer" style="text-align: center;">
+      <p>还没有账号？<a href="/register">立即注册</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // 检查登录状态，如果已登录则跳转到主页
+  document.addEventListener('DOMContentLoaded', function() {
+    const token = localStorage.getItem('access_token');
+    const redirectParam = new URLSearchParams(window.location.search).get('redirect');
+    
+    if (token) {
+      window.location.href = redirectParam || '/';
+    }
+  });
+</script>
+{% endblock %} 

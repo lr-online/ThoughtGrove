@@ -1,251 +1,99 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>注册 - 拙园</title>
-  <meta name="description" content="注册拙园，开始记录和整理您的思考">
-  <link rel="stylesheet" href="/static/css/styles.css">
-  <link rel="manifest" href="/static/manifest.json">
-  <link rel="icon" href="/static/images/favicon.ico">
-  <meta name="theme-color" content="#a2432e">
-  <!-- 添加PWA相关标签 -->
-  <link rel="apple-touch-icon" href="/static/images/icon-192.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <style>
-    body {
-      background-color: var(--color-light);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-    
-    .register-container {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 2rem;
-    }
-    
-    .register-card {
-      background-color: white;
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-md);
-      width: 100%;
-      max-width: 450px;
-      padding: 2rem;
-    }
-    
-    .register-header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-    
-    .register-title {
-      font-family: var(--font-serif);
-      font-size: 2rem;
-      color: var(--color-primary);
-      margin-bottom: 0.5rem;
-    }
-    
-    .register-subtitle {
-      color: var(--color-secondary);
-      font-size: 1rem;
-    }
-    
-    .register-form {
-      margin-bottom: 1rem;
-    }
-    
-    .form-footer {
-      text-align: center;
-      margin-top: 1.5rem;
-      font-size: 0.9rem;
-    }
-    
-    .field-error {
-      color: var(--color-error);
-      font-size: 0.8rem;
-      margin-top: 0.25rem;
-    }
-    
-    .has-error {
-      border-color: var(--color-error) !important;
-    }
-    
-    .password-requirements {
-      font-size: 0.8rem;
-      color: var(--color-secondary);
-      margin-top: 0.25rem;
-    }
-    
-    .garden-decoration {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 100%;
-      z-index: -1;
-      opacity: 0.2;
-      pointer-events: none;
-      transform: rotate(180deg);
-    }
-    
-    @media (min-width: 768px) {
-      .garden-decoration {
-        opacity: 0.3;
-      }
-    }
-  </style>
-</head>
-<body>
-  <!-- 头部导航 -->
-  <header class="header">
-    <div class="container">
-      <div class="header-content">
-        <div class="logo">
-          <a href="/">拙园</a>
-        </div>
-        <nav class="nav">
-          <a href="/">首页</a>
-          <a href="/about">关于</a>
-          <a href="/login">登录</a>
-          <a href="/register" class="active">注册</a>
-        </nav>
-        <div class="theme-toggle-wrapper">
-          <span>🌙</span>
-          <label class="theme-toggle">
-            <input type="checkbox" id="theme-toggle">
-            <span class="slider"></span>
-          </label>
-          <span>☀️</span>
-        </div>
-        <button class="mobile-menu-toggle" id="menu-toggle">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-          </svg>
-        </button>
-      </div>
-    </div>
-  </header>
+{% extends "layout.html" %}
+
+{% block title %}注册 - 拙园{% endblock %}
+{% block description %}注册拙园，开始记录和整理您的思考{% endblock %}
+
+{% block styles %}
+<style>
+  .register-container {
+    padding: 3rem 1rem;
+    display: flex;
+    justify-content: center;
+  }
   
-  <!-- 移动端导航菜单 -->
-  <div id="mobile-menu" class="hidden">
-    <a href="/">首页</a>
-    <a href="/about">关于</a>
-    <a href="/login">登录</a>
-    <a href="/register" class="active">注册</a>
+  .register-card {
+    max-width: 450px;
+    width: 100%;
+  }
+  
+  .register-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .register-title {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .form-footer {
+    margin-top: 1.5rem;
+    text-align: center;
+  }
+  
+  .password-requirements {
+    font-size: 0.8rem;
+    color: var(--color-text-tertiary);
+    margin-top: 0.25rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-container">
+  <div class="card register-card">
+    <div class="card-header">
+      <h1 class="card-title register-title" style="text-align: center;">创建您的账号</h1>
+    </div>
+    
+    <!-- 显示注册错误信息 -->
+    <div id="error-message" class="error-message hidden"></div>
+    
+    <form id="register-form" class="card-body">
+      <div class="form-group">
+        <label for="username" class="form-label">用户名</label>
+        <input type="text" id="username" name="username" class="form-control" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="email" class="form-label">电子邮箱</label>
+        <input type="email" id="email" name="email" class="form-control" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="password" class="form-label">密码</label>
+        <input type="password" id="password" name="password" class="form-control" required>
+        <small class="password-requirements">密码至少需要8个字符，包含大小写字母和数字</small>
+      </div>
+      
+      <div class="form-group">
+        <label for="confirm-password" class="form-label">确认密码</label>
+        <input type="password" id="confirm-password" name="confirm-password" class="form-control" required>
+      </div>
+      
+      <div class="form-group">
+        <input type="checkbox" id="terms" name="terms" required>
+        <label for="terms">我已阅读并同意<a href="/terms" target="_blank">使用条款</a>和<a href="/privacy" target="_blank">隐私政策</a></label>
+      </div>
+      
+      <button type="submit" class="btn w-full">注册</button>
+    </form>
+    
+    <div class="card-footer" style="text-align: center;">
+      <p>已有账号？<a href="/login">立即登录</a></p>
+    </div>
   </div>
-  
-  <!-- 主要内容 -->
-  <main class="content">
-    <div class="container">
-      <div class="flex justify-center">
-        <div class="card" style="max-width: 450px; width: 100%;">
-          <div class="card-header">
-            <h1 class="card-title" style="text-align: center;">创建您的账号</h1>
-          </div>
-          
-          <!-- 显示注册错误信息 -->
-          <div id="error-message" class="error-message hidden"></div>
-          
-          <form id="register-form" class="card-body">
-            <div class="form-group">
-              <label for="username" class="form-label">用户名</label>
-              <input type="text" id="username" name="username" class="form-control" required>
-            </div>
-            
-            <div class="form-group">
-              <label for="email" class="form-label">电子邮箱</label>
-              <input type="email" id="email" name="email" class="form-control" required>
-            </div>
-            
-            <div class="form-group">
-              <label for="password" class="form-label">密码</label>
-              <input type="password" id="password" name="password" class="form-control" required>
-              <small class="form-text text-muted">密码至少需要8个字符，包含大小写字母和数字</small>
-            </div>
-            
-            <div class="form-group">
-              <label for="confirm-password" class="form-label">确认密码</label>
-              <input type="password" id="confirm-password" name="confirm-password" class="form-control" required>
-            </div>
-            
-            <div class="form-group">
-              <input type="checkbox" id="terms" name="terms" required>
-              <label for="terms">我已阅读并同意<a href="/terms" target="_blank">使用条款</a>和<a href="/privacy" target="_blank">隐私政策</a></label>
-            </div>
-            
-            <button type="submit" class="btn w-full">注册</button>
-          </form>
-          
-          <div class="card-footer" style="text-align: center;">
-            <p>已有账号？<a href="/login">立即登录</a></p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </main>
-  
-  <!-- 底部 -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-content">
-        <div>&copy; 2024 拙园 ThoughtGrove</div>
-        <div class="footer-links">
-          <a href="/terms">使用条款</a>
-          <a href="/privacy">隐私政策</a>
-          <a href="/contact">联系我们</a>
-        </div>
-      </div>
-    </div>
-  </footer>
-  
-  <!-- JavaScript -->
-  <script src="/static/js/main.js"></script>
-  <script>
-    // 检查登录状态，如果已登录则跳转到主页
-    document.addEventListener('DOMContentLoaded', function() {
-      const token = localStorage.getItem('access_token');
-      
-      if (token) {
-        window.location.href = '/';
-      }
-      
-      // 密码强度检查
-      const passwordInput = document.getElementById('password');
-      const confirmPasswordInput = document.getElementById('confirm-password');
-      
-      passwordInput.addEventListener('input', function() {
-        validatePassword(this);
-      });
-      
-      confirmPasswordInput.addEventListener('input', function() {
-        validateConfirmPassword(this, passwordInput);
-      });
-      
-      function validatePassword(input) {
-        const value = input.value;
-        const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-        
-        if (value && !regex.test(value)) {
-          input.setCustomValidity('密码至少需要8个字符，包含大小写字母和数字');
-        } else {
-          input.setCustomValidity('');
-        }
-      }
-      
-      function validateConfirmPassword(input, passwordInput) {
-        if (input.value !== passwordInput.value) {
-          input.setCustomValidity('两次输入的密码不一致');
-        } else {
-          input.setCustomValidity('');
-        }
-      }
-    });
-  </script>
-</body>
-</html> 
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // 检查用户是否已登录
+    const token = localStorage.getItem('access_token');
+    if (token) {
+      window.location.href = '/';
+    }
+  });
+</script>
+{% endblock %} 
