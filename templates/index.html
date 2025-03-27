@@ -229,7 +229,7 @@
     </svg>
     <h2>您还没有创建任何笔记</h2>
     <p>点击"新建笔记"按钮开始记录您的思考</p>
-    <a href="/notes/new" class="btn">创建第一篇笔记</a>
+    <!-- <a href="/notes/new" class="btn">创建第一篇笔记</a> -->
   </div>
 </div>
 
@@ -283,7 +283,7 @@
       logoutLink.addEventListener('click', function(e) {
         e.preventDefault();
         localStorage.removeItem('access_token');
-        window.location.href = '/login';
+        window.location.href = '/';
       });
     }
     

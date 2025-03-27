@@ -174,7 +174,7 @@
         <div class="header-actions">
           <!-- 未登录状态显示 -->
           <div class="auth-link auth-links" data-auth="false">
-            <a href="/login" class="btn btn-text">登录</a>
+            <!-- <a href="/login" class="btn btn-text">登录</a>--> <!-- 首页中间有了登录按钮，所以暂时隐藏 -->
             <!-- <a href="/register" class="btn btn-outline">注册</a> --> <!-- 注册按钮可以通过点击登录按钮进入注册页面，所以暂时隐藏 -->
             <button id="theme-toggle" class="theme-toggle-btn" title="切换主题">
               <svg class="theme-icon sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -196,8 +196,8 @@
           
           <!-- 登录状态显示 -->
           <div class="user-actions auth-link" data-auth="true" style="display: none;">
-            <a href="/profile" class="btn btn-text">个人中心</a>
-            <a href="#" id="logout-link" class="btn btn-text">退出</a>
+            <!-- <a href="/profile" class="btn btn-text">个人中心</a> -->
+            <a href="/" id="logout-link" class="btn btn-text">退出</a>
             <button id="theme-toggle-auth" class="theme-toggle-btn" title="切换主题">
               <svg class="theme-icon sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="5"></circle>
