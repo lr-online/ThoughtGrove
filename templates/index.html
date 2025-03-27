@@ -154,28 +154,6 @@
     .footer-link:hover {
       color: white;
     }
-    
-    @media (max-width: 768px) {
-      .footer-content {
-        flex-direction: column;
-        text-align: center;
-        gap: var(--spacing-md);
-      }
-      
-      .notes-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: var(--spacing-md);
-      }
-      
-      .notes-actions {
-        width: 100%;
-      }
-      
-      .notes-actions .btn {
-        flex: 1;
-      }
-    }
   </style>
 </head>
 <body>
@@ -234,27 +212,9 @@
             </button>
           </div>
         </div>
-        <!-- 移动端菜单按钮 -->
-        <button class="mobile-menu-toggle" id="menu-toggle">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-          </svg>
-        </button>
       </div>
     </div>
   </header>
-  
-  <!-- 移动端导航菜单 -->
-  <div id="mobile-menu" class="hidden">
-    <div class="auth-link" data-auth="true" style="display: none;">
-      <a href="/notes/new">新建笔记</a>
-      <a href="/notes">笔记列表</a>
-      <a href="/profile">个人中心</a>
-      <a href="#" id="mobile-logout-link">退出</a>
-    </div>
-  </div>
   
   <!-- 主要内容 -->
   <main class="content">
@@ -394,10 +354,6 @@
       const registerLink = document.getElementById('register-link');
       const profileLink = document.getElementById('profile-link');
       const logoutLink = document.getElementById('logout-link');
-      const mobileLoginLink = document.getElementById('mobile-login-link');
-      const mobileRegisterLink = document.getElementById('mobile-register-link');
-      const mobileProfileLink = document.getElementById('mobile-profile-link');
-      const mobileLogoutLink = document.getElementById('mobile-logout-link');
       
       // 根据登录状态显示不同的导航项和视图
       if (token) {
@@ -410,18 +366,12 @@
         profileLink.style.display = 'inline-block';
         logoutLink.style.display = 'inline-block';
         
-        mobileLoginLink.style.display = 'none';
-        mobileRegisterLink.style.display = 'none';
-        mobileProfileLink.style.display = 'block';
-        mobileLogoutLink.style.display = 'block';
-        
         // 加载用户笔记
         loadNotes();
       }
       
       // 退出登录
       logoutLink.addEventListener('click', handleLogout);
-      mobileLogoutLink.addEventListener('click', handleLogout);
       
       function handleLogout(e) {
         e.preventDefault();

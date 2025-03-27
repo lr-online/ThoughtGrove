@@ -38,9 +38,6 @@ function initUI() {
   // 初始化主题切换
   initThemeToggle();
   
-  // 初始化移动端导航
-  initMobileNav();
-  
   // 如果存在编辑器，初始化编辑器
   if (document.querySelector('#note-editor')) {
     initNoteEditor();
@@ -137,19 +134,6 @@ function initThemeToggle() {
     if (!localStorage.getItem('theme')) {
       document.documentElement.classList.toggle('dark-theme', e.matches);
     }
-  });
-}
-
-// 初始化移动端导航
-function initMobileNav() {
-  const menuToggle = document.querySelector('#menu-toggle');
-  const mobileMenu = document.querySelector('#mobile-menu');
-  
-  if (!menuToggle || !mobileMenu) return;
-  
-  menuToggle.addEventListener('click', () => {
-    mobileMenu.classList.toggle('hidden');
-    document.body.classList.toggle('overflow-hidden');
   });
 }
 
@@ -343,8 +327,7 @@ async function handleNoteDelete(event) {
         window.location.href = '/';
       }
     } else {
-      const data = await response.json();
-      alert(data.detail || '删除笔记失败');
+      alert('删除笔记失败，请稍后再试');
     }
   } catch (error) {
     console.error('删除笔记请求失败:', error);
@@ -355,264 +338,83 @@ async function handleNoteDelete(event) {
 // 处理笔记搜索
 function handleNoteSearch(event) {
   const searchTerm = event.target.value.toLowerCase();
-  const noteCards = document.querySelectorAll('.note-card');
+  const noteElements = document.querySelectorAll('.note-item');
   
-  noteCards.forEach(card => {
-    const title = card.querySelector('.note-title').textContent.toLowerCase();
-    const content = card.querySelector('.note-excerpt').textContent.toLowerCase();
+  noteElements.forEach(note => {
+    const title = note.querySelector('.note-title').textContent.toLowerCase();
+    const content = note.querySelector('.note-preview').textContent.toLowerCase();
     
     if (title.includes(searchTerm) || content.includes(searchTerm)) {
-      card.style.display = 'block';
+      note.style.display = '';
     } else {
-      card.style.display = 'none';
+      note.style.display = 'none';
     }
   });
 }
 
-// 防抖函数
+// 工具函数：防抖
 function debounce(func, wait) {
   let timeout;
   return function(...args) {
+    const context = this;
     clearTimeout(timeout);
-    timeout = setTimeout(() => func.apply(this, args), wait);
+    timeout = setTimeout(() => func.apply(context, args), wait);
   };
 }
 
-// API请求工具
-const api = {
-  baseUrl: '/api',
+// 工具函数：格式化日期
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
   
-  async request(endpoint, options = {}) {
-    const url = this.baseUrl + endpoint;
-    
-    // 默认配置
-    const defaultOptions = {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    };
-    
-    // 合并选项
-    const requestOptions = { ...defaultOptions, ...options };
-    
-    // 添加身份验证令牌（如果存在）
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      requestOptions.headers['Authorization'] = `Bearer ${token}`;
-    }
-    
-    try {
-      const response = await fetch(url, requestOptions);
-      
-      // 处理未授权错误
-      if (response.status === 401) {
-        // 清除令牌并重定向到登录页面
-        localStorage.removeItem('authToken');
-        window.location.href = '/login';
-        return null;
-      }
-      
-      // 解析响应
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.detail || '请求失败');
-      }
-      
-      return data;
-    } catch (error) {
-      console.error('API请求错误:', error);
-      showToast(error.message || '请求失败，请稍后重试', 'error');
-      return null;
-    }
-  },
-  
-  // GET请求
-  get(endpoint) {
-    return this.request(endpoint, { method: 'GET' });
-  },
-  
-  // POST请求
-  post(endpoint, data) {
-    return this.request(endpoint, {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
-  },
-  
-  // PUT请求
-  put(endpoint, data) {
-    return this.request(endpoint, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    });
-  },
-  
-  // DELETE请求
-  delete(endpoint) {
-    return this.request(endpoint, { method: 'DELETE' });
-  },
-};
-
-// 身份验证功能
-const auth = {
-  // 用户注册
-  async register(userData) {
-    const result = await api.post('/auth/register', userData);
-    
-    if (result) {
-      showToast('注册成功，请登录', 'success');
-      return true;
-    }
-    
-    return false;
-  },
-  
-  // 用户登录
-  async login(credentials) {
-    try {
-      const response = await fetch('/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          username: credentials.email,
-          password: credentials.password,
-        }),
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.detail || '登录失败');
-      }
-      
-      // 保存令牌
-      localStorage.setItem('authToken', data.access_token);
-      return true;
-    } catch (error) {
-      console.error('登录错误:', error);
-      showToast(error.message || '登录失败，请检查您的凭据', 'error');
-      return false;
-    }
-  },
-  
-  // 注销
-  logout() {
-    localStorage.removeItem('authToken');
-    window.location.href = '/login';
-  },
-  
-  // 检查用户是否已认证
-  isAuthenticated() {
-    return !!localStorage.getItem('authToken');
-  },
-};
-
-// 笔记功能
-const notes = {
-  // 获取用户所有笔记
-  async getAllNotes() {
-    return await api.get('/notes/');
-  },
-  
-  // 获取笔记详情
-  async getNote(id) {
-    return await api.get(`/notes/${id}`);
-  },
-  
-  // 创建笔记
-  async createNote(noteData) {
-    return await api.post('/notes/', noteData);
-  },
-  
-  // 更新笔记
-  async updateNote(id, noteData) {
-    return await api.put(`/notes/${id}`, noteData);
-  },
-  
-  // 删除笔记
-  async deleteNote(id) {
-    return await api.delete(`/notes/${id}`);
-  },
-};
-
-// 辅助函数
-function showFieldError(field, message) {
-  // 清除可能存在的错误
-  clearFieldError(field);
-  
-  // 创建错误消息元素
-  const errorElement = document.createElement('div');
-  errorElement.className = 'field-error';
-  errorElement.textContent = message;
-  
-  // 添加错误样式到字段
-  field.classList.add('has-error');
-  
-  // 插入错误消息
-  field.parentNode.appendChild(errorElement);
+  return `${year}-${month}-${day}`;
 }
 
-function clearFieldError(field) {
-  field.classList.remove('has-error');
-  
-  // 删除可能存在的错误消息
-  const existingError = field.parentNode.querySelector('.field-error');
-  if (existingError) {
-    existingError.remove();
-  }
+// 工具函数：截断文本
+function truncateText(text, maxLength = 150) {
+  if (text.length <= maxLength) return text;
+  return text.substring(0, maxLength) + '...';
 }
 
-function isValidEmail(email) {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
-
-function isValidPassword(password) {
-  // 至少8个字符，包含大小写字母和数字
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-  return passwordRegex.test(password);
-}
-
-function showToast(message, type = 'info') {
-  // 检查是否存在toast容器
-  let toastContainer = document.querySelector('.toast-container');
+// 工具函数：显示消息提示
+function showMessage(message, type = 'info') {
+  const messageContainer = document.getElementById('message-container');
+  if (!messageContainer) return;
   
-  if (!toastContainer) {
-    // 创建toast容器
-    toastContainer = document.createElement('div');
-    toastContainer.className = 'toast-container';
-    document.body.appendChild(toastContainer);
-  }
+  const messageElement = document.createElement('div');
+  messageElement.className = `alert alert-${type}`;
+  messageElement.textContent = message;
   
-  // 创建toast元素
-  const toast = document.createElement('div');
-  toast.className = `toast toast-${type}`;
-  toast.textContent = message;
+  messageContainer.appendChild(messageElement);
   
-  // 添加到容器
-  toastContainer.appendChild(toast);
-  
-  // 淡出动画
+  // 3秒后自动移除
   setTimeout(() => {
-    toast.classList.add('fade-out');
-    
-    // 移除元素
-    setTimeout(() => {
-      toast.remove();
-    }, 300);
+    messageElement.style.opacity = '0';
+    setTimeout(() => messageElement.remove(), 300);
   }, 3000);
 }
 
-// 服务工作线程注册 (PWA支持)
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/sw.js').then(function(registration) {
-      console.log('ServiceWorker注册成功，范围: ', registration.scope);
-    }).catch(function(error) {
-      console.log('ServiceWorker注册失败: ', error);
-    });
-  });
-} 
+// 工具函数：从URL获取查询参数
+function getQueryParam(param) {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(param);
+}
+
+// 检查URL参数，显示相应消息
+function checkURLMessages() {
+  const registered = getQueryParam('registered');
+  const loggedOut = getQueryParam('logged_out');
+  
+  if (registered === 'true') {
+    showMessage('注册成功！请使用您的邮箱和密码登录。', 'success');
+  }
+  
+  if (loggedOut === 'true') {
+    showMessage('您已成功退出登录。', 'info');
+  }
+}
+
+// 在页面加载时检查URL消息
+checkURLMessages(); 
