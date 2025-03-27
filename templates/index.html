@@ -4,190 +4,113 @@
 
 {% block styles %}
 <style>
-  /* 未登录状态的样式 */
-  #guest-view .hero {
-    margin-top: 2rem;
+  /* 产品介绍页面样式 */
+  .home-container {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 2rem 0;
+  }
+  
+  .hero {
+    margin: 2rem 0 3rem;
     text-align: center;
     padding: 3rem 2rem;
     border-radius: 8px;
     background-color: var(--color-bg-secondary);
   }
   
-  #guest-view .hero h1 {
+  .hero h1 {
     font-size: 2.5rem;
     margin-bottom: 1rem;
     color: var(--color-text-primary);
   }
   
-  #guest-view .hero p {
+  .hero p {
     font-size: 1.25rem;
-    max-width: 600px;
+    max-width: 700px;
     margin: 1rem auto;
     color: var(--color-text-secondary);
   }
   
-  #guest-view .hero .btn-container {
+  .hero .btn-container {
     margin-top: 2rem;
     display: flex;
     justify-content: center;
     gap: 1rem;
   }
   
-  #guest-view .features {
+  .features {
     margin: 3rem 0;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
   }
   
-  #guest-view .features .card {
+  .features .card {
     height: 100%;
     display: flex;
     flex-direction: column;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
   
-  #guest-view .features .card h3 {
+  .features .card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+  }
+  
+  .features .card h3 {
     margin-bottom: 1rem;
     color: var(--color-accent);
   }
   
-  /* 登录状态的样式 */
-  #user-view {
-    padding-top: 1.5rem;
-  }
-  
-  #user-view .header-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-  }
-  
-  #user-view .header-section h1 {
-    margin-bottom: 0;
-  }
-  
-  #user-view .search-container {
-    margin-bottom: 2rem;
-  }
-  
-  #user-view .search-container input {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border-radius: 6px;
-    border: 1px solid var(--color-border);
+  /* 额外样式增强 */
+  .get-started-section {
+    text-align: center;
+    padding: 3rem 0;
+    margin: 2rem 0;
     background-color: var(--color-bg-secondary);
+    border-radius: 8px;
   }
   
-  #user-view .notes-loading {
-    text-align: center;
-    padding: 3rem 0;
-    color: var(--color-text-secondary);
-  }
-  
-  #user-view #empty-notes {
-    padding: 3rem 0;
-    text-align: center;
-  }
-  
-  #user-view #empty-notes svg {
-    color: var(--color-text-tertiary);
-    opacity: 0.5;
+  .get-started-section h2 {
     margin-bottom: 1.5rem;
-  }
-  
-  #user-view #empty-notes h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-  }
-  
-  #user-view #empty-notes p {
-    color: var(--color-text-secondary);
-    margin-bottom: 1.5rem;
-  }
-  
-  /* 笔记卡片样式 */
-  .note-item {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    border-left: 4px solid var(--color-accent);
-    margin-bottom: 1.5rem;
-  }
-  
-  .note-item:hover {
-    transform: translateX(5px);
-  }
-  
-  .note-title {
-    font-size: 1.25rem;
-    font-weight: 600;
+    font-size: 2rem;
     color: var(--color-text-primary);
-    margin-bottom: 0.5rem;
   }
   
-  .note-preview {
+  .get-started-section p {
+    max-width: 700px;
+    margin: 0 auto 1.5rem;
     color: var(--color-text-secondary);
+  }
+  
+  .footer-banner {
+    margin-top: 3rem;
+    padding: 2rem;
+    background: linear-gradient(to right, rgba(var(--color-accent-rgb), 0.1), rgba(var(--color-accent-rgb), 0.3));
+    border-radius: 8px;
+    text-align: center;
+  }
+  
+  .footer-banner h3 {
     margin-bottom: 1rem;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-  }
-  
-  .note-meta {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.85rem;
-    color: var(--color-text-secondary);
-  }
-  
-  .note-actions {
-    display: flex;
-    gap: 0.75rem;
-  }
-  
-  /* 添加可点击样式 */
-  .note-title-link {
     color: var(--color-text-primary);
-    text-decoration: none;
-    cursor: pointer;
   }
   
-  .note-title-link:hover {
-    color: var(--color-accent);
-    text-decoration: none;
-  }
-  
-  .note-content-link {
-    display: block;
-    text-decoration: none;
-    cursor: pointer;
-  }
-  
-  .note-content-link:hover {
-    text-decoration: none;
-  }
-  
-  .card-clickable {
-    cursor: pointer;
-  }
-  
-  .card-header, .card-body {
-    position: relative;
-    z-index: 1;
+  .footer-banner .btn {
+    margin-top: 1rem;
   }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- 未登录状态展示 -->
-<div id="guest-view">
+<div class="home-container">
   <div class="hero">
     <h1>拙园 ThoughtGrove</h1>
     <p>一个简洁优雅的个人笔记和思考整理工具，让您随时随地记录灵感，整理思绪。</p>
     <div class="btn-container">
       <a href="/login" class="btn btn-lg">立即登录</a>
-      <a href="https://github.com/lr-online/ThoughtGrove" class="btn btn-outline btn-lg">了解更多</a>
+      <a href="/register" class="btn btn-outline btn-lg">免费注册</a>
     </div>
   </div>
   
@@ -216,265 +139,29 @@
       <h3>思想时间胶囊</h3>
       <p>将思考封存在特定的时间胶囊中，设置未来开启的时机，与未来的自己对话，见证思想和观念的演变。</p>
     </div>
-    <div class="card">
-      <h3>认知偏见提醒</h3>
-      <p>系统智能识别思考中可能存在的认知偏见，提供多角度思考建议，帮助您建立更全面客观的思维方式。</p>
-    </div>
-    <div class="card">
-      <h3>创意激发工具</h3>
-      <p>基于您的历史内容和兴趣，提供个性化的思考提示和灵感激发，帮助突破思维局限，产生创新性想法。</p>
-    </div>
-    <div class="card">
-      <h3>跨媒介知识整合</h3>
-      <p>支持文字、图片、语音、手绘等多种记录方式，将不同形式的思想碎片整合为完整的知识体系。</p>
-    </div>
+  </div>
+  
+  <div class="get-started-section">
+    <h2>开始您的思考之旅</h2>
+    <p>无论您是追求创意的作家、需要整理思路的学生，还是希望记录成长的个人，拙园都能为您提供最适合的思考空间。</p>
+    <a href="/register" class="btn btn-lg">立即开始</a>
+  </div>
+  
+  <div class="footer-banner">
+    <h3>加入拙园社区</h3>
+    <p>成为拙园用户，与志同道合的思考者共同成长。</p>
+    <a href="/register" class="btn">免费注册</a>
   </div>
 </div>
-
-<!-- 登录状态展示 -->
-<div id="user-view" style="display: none;">
-  <div class="header-section">
-    <h1>我的笔记</h1>
-    <a href="/notes/new" class="btn">新建笔记</a>
-  </div>
-  
-  <div class="search-container">
-    <input type="text" id="note-search" class="form-control" placeholder="搜索笔记...">
-  </div>
-  
-  <div id="notes-container">
-    <!-- 笔记列表将通过JavaScript动态加载 -->
-    <div class="notes-loading">
-      <p>加载中...</p>
-    </div>
-  </div>
-  
-  <!-- 无笔记时显示 -->
-  <div id="empty-notes" style="display: none;">
-    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-      <polyline points="14 2 14 8 20 8"></polyline>
-      <line x1="16" y1="13" x2="8" y2="13"></line>
-      <line x1="16" y1="17" x2="8" y2="17"></line>
-      <polyline points="10 9 9 9 8 9"></polyline>
-    </svg>
-    <h2>您还没有创建任何笔记</h2>
-    <p>点击"新建笔记"按钮开始记录您的思考</p>
-    <!-- <a href="/notes/new" class="btn">创建第一篇笔记</a> -->
-  </div>
-</div>
-
-<!-- 笔记项模板 -->
-<template id="note-template">
-  <div class="card note-item">
-    <div class="card-header">
-      <h3 class="note-title"></h3>
-      <div class="note-meta">
-        <span class="note-date"></span>
-        <span class="note-tags"></span>
-      </div>
-    </div>
-    <div class="card-body">
-      <p class="note-preview"></p>
-    </div>
-    <div class="card-footer">
-      <div class="note-actions">
-        <a href="#" class="btn btn-sm btn-outline edit-note-btn">编辑</a>
-        <button class="btn btn-sm delete-note-btn" data-note-id="">删除</button>
-      </div>
-    </div>
-  </div>
-</template>
 {% endblock %}
 
 {% block scripts %}
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // 如果用户已登录，重定向到笔记列表页面
     const token = localStorage.getItem('access_token');
-    const guestView = document.getElementById('guest-view');
-    const userView = document.getElementById('user-view');
-    const logoutLink = document.getElementById('logout-link');
-    
-    // 根据登录状态显示不同的视图
     if (token) {
-      // 用户已登录
-      guestView.style.display = 'none';
-      userView.style.display = 'block';
-      
-      // 加载用户笔记
-      loadNotes();
-    } else {
-      // 用户未登录
-      guestView.style.display = 'block';
-      userView.style.display = 'none';
-    }
-    
-    // 退出登录
-    if (logoutLink) {
-      logoutLink.addEventListener('click', function(e) {
-        e.preventDefault();
-        localStorage.removeItem('access_token');
-        window.location.href = '/';
-      });
-    }
-    
-    // 搜索功能
-    const searchInput = document.getElementById('note-search');
-    if (searchInput) {
-      searchInput.addEventListener('input', function(e) {
-        const searchTerm = e.target.value.toLowerCase();
-        const noteElements = document.querySelectorAll('.note-item');
-        
-        noteElements.forEach(note => {
-          const title = note.querySelector('.note-title').textContent.toLowerCase();
-          const content = note.querySelector('.note-preview').textContent.toLowerCase();
-          
-          if (title.includes(searchTerm) || content.includes(searchTerm)) {
-            note.style.display = 'block';
-          } else {
-            note.style.display = 'none';
-          }
-        });
-      });
-    }
-    
-    // 加载笔记列表
-    async function loadNotes() {
-      const notesContainer = document.getElementById('notes-container');
-      const emptyNotes = document.getElementById('empty-notes');
-      
-      try {
-        const response = await fetch('/api/notes/', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        
-        if (!response.ok) {
-          throw new Error('获取笔记失败');
-        }
-        
-        const notes = await response.json();
-        
-        // 移除加载中提示
-        notesContainer.innerHTML = '';
-        
-        if (notes.length === 0) {
-          // 显示无笔记提示
-          emptyNotes.style.display = 'block';
-        } else {
-          // 渲染笔记列表
-          notes.forEach(note => {
-            const noteElement = createNoteElement(note);
-            notesContainer.appendChild(noteElement);
-          });
-          
-          // 绑定删除事件
-          document.querySelectorAll('.delete-note-btn').forEach(btn => {
-            btn.addEventListener('click', handleDeleteNote);
-          });
-        }
-      } catch (error) {
-        console.error('加载笔记失败:', error);
-        notesContainer.innerHTML = `
-          <div style="text-align: center; padding: 2rem 0;">
-            <p>加载笔记失败，请稍后再试</p>
-            <button id="retry-load" class="btn btn-sm" style="margin-top: 1rem;">重试</button>
-          </div>
-        `;
-        
-        document.getElementById('retry-load')?.addEventListener('click', loadNotes);
-      }
-    }
-    
-    // 创建笔记元素
-    function createNoteElement(note) {
-      const template = document.getElementById('note-template');
-      const noteElement = document.importNode(template.content, true).firstElementChild;
-      
-      // 添加可点击样式
-      noteElement.classList.add('card-clickable');
-      
-      // 设置笔记内容
-      const titleElement = noteElement.querySelector('.note-title');
-      const previewElement = noteElement.querySelector('.note-preview');
-      
-      // 创建标题链接
-      const titleLink = document.createElement('a');
-      titleLink.href = `/notes/${note.id}`;
-      titleLink.className = 'note-title-link';
-      titleLink.textContent = note.title;
-      titleElement.innerHTML = ''; // 清空标题
-      titleElement.appendChild(titleLink);
-      
-      // 创建内容链接
-      const contentLink = document.createElement('a');
-      contentLink.href = `/notes/${note.id}`;
-      contentLink.className = 'note-content-link';
-      contentLink.textContent = note.content.substring(0, 200) + (note.content.length > 200 ? '...' : '');
-      previewElement.innerHTML = ''; // 清空预览
-      previewElement.appendChild(contentLink);
-      
-      // 格式化日期
-      const date = new Date(note.updated_at || note.created_at);
-      noteElement.querySelector('.note-date').textContent = `更新于 ${date.toLocaleDateString('zh-CN')}`;
-      
-      // 设置链接和ID
-      noteElement.querySelector('.edit-note-btn').href = `/notes/edit?id=${note.id}`;
-      noteElement.querySelector('.delete-note-btn').dataset.noteId = note.id;
-      
-      // 添加卡片点击事件（整体可点击）
-      const cardHeader = noteElement.querySelector('.card-header');
-      const cardBody = noteElement.querySelector('.card-body');
-      
-      cardHeader.addEventListener('click', function(e) {
-        // 阻止点击按钮时的冒泡
-        if (!e.target.closest('.note-actions')) {
-          window.location.href = `/notes/${note.id}`;
-        }
-      });
-      
-      cardBody.addEventListener('click', function() {
-        window.location.href = `/notes/${note.id}`;
-      });
-      
-      return noteElement;
-    }
-    
-    // 处理笔记删除
-    async function handleDeleteNote(e) {
-      const noteId = e.target.dataset.noteId;
-      if (!noteId) return;
-      
-      const confirmDelete = confirm('确定要删除这篇笔记吗？此操作不可撤销。');
-      if (!confirmDelete) return;
-      
-      try {
-        const response = await fetch(`/api/notes/${noteId}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        
-        if (!response.ok) {
-          throw new Error('删除笔记失败');
-        }
-        
-        // 从DOM中删除笔记元素
-        const noteElement = e.target.closest('.note-item');
-        if (noteElement) {
-          noteElement.remove();
-          
-          // 如果删除后没有笔记了，显示空状态
-          if (document.querySelectorAll('.note-item').length === 0) {
-            document.getElementById('empty-notes').style.display = 'block';
-          }
-        }
-      } catch (error) {
-        console.error('删除笔记失败:', error);
-        alert('删除笔记失败，请稍后再试');
-      }
+      window.location.href = '/notes';
     }
   });
 </script>

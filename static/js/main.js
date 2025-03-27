@@ -90,6 +90,16 @@ function setupEventListeners() {
   if (searchInput) {
     searchInput.addEventListener('input', debounce(handleNoteSearch, 300));
   }
+  
+  // 退出登录
+  const logoutLink = document.querySelector('#logout-link');
+  if (logoutLink) {
+    logoutLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      localStorage.removeItem('access_token');
+      window.location.href = '/';
+    });
+  }
 }
 
 // 高亮当前导航项

@@ -11,8 +11,13 @@ router = APIRouter(tags=["pages"])
 
 @router.get("/", response_class=HTMLResponse)
 async def home(request: Request):
-    """首页 - 笔记列表页面"""
+    """首页 - 产品介绍页面"""
     return templates.TemplateResponse("index.html", {"request": request})
+
+@router.get("/notes", response_class=HTMLResponse)
+async def notes_list(request: Request):
+    """笔记列表页面"""
+    return templates.TemplateResponse("notes_list.html", {"request": request})
 
 @router.get("/login", response_class=HTMLResponse)
 async def login(request: Request):
